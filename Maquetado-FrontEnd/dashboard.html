@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard NPS · Coppel TI</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --azul:        #003087;
+    --azul-medio:  #0047BA;
+    --azul-claro:  #E8F0FD;
+    --azul-dark:   #001D5E;
+    --amarillo:    #FFB800;
+    --amarillo-bg: #FFF8E1;
+    --gris-bg:     #EEF1F8;
+    --gris-borde:  #DDE3EF;
+    --texto:       #1A2340;
+    --subtexto:    #5A6480;
+    --blanco:      #FFFFFF;
+    --verde:       #1B8A5A;
+    --verde-bg:    #E8F5EF;
+    --rojo:        #D32F2F;
+    --rojo-bg:     #FDECEA;
+    --naranja:     #E65100;
+    --naranja-bg:  #FFF3E0;
+    --sidebar-w:   220px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Figtree', sans-serif; background: var(--gris-bg); color: var(--texto); display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--azul-dark);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .logo-mark {
+    width: 34px; height: 34px;
+    background: var(--amarillo);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; color: var(--azul); flex-shrink: 0;
+  }
+
+  .logo-name { color: white; font-weight: 700; font-size: 15px; line-height: 1.1; }
+  .logo-name small { display: block; color: rgba(255,255,255,0.45); font-size: 11px; font-weight: 500; }
+
+  .nav-section { padding: 14px 12px 6px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    margin: 1px 8px;
+    border-radius: 8px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13.5px; font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+  .nav-item.active { background: var(--azul-medio); color: white; font-weight: 600; }
+  .nav-item svg { flex-shrink: 0; }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--rojo);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 14px 16px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .user-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--azul-medio);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+
+  .user-info { flex: 1; overflow: hidden; }
+  .user-info .name { font-size: 12.5px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-info .role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  /* ── Main ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    background: var(--blanco);
+    border-bottom: 1px solid var(--gris-borde);
+    padding: 0 1.75rem;
+    height: 58px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .topbar-left h1 { font-size: 17px; font-weight: 800; color: var(--texto); }
+  .topbar-left p  { font-size: 12px; color: var(--subtexto); }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .filter-btn {
+    display: flex; align-items: center; gap: 6px;
+    border: 1.5px solid var(--gris-borde);
+    background: white;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 13px; font-weight: 600; color: var(--texto);
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .filter-btn:hover { border-color: var(--azul-medio); }
+
+  .btn-export {
+    background: var(--azul);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 7px;
+    transition: background 0.2s;
+  }
+  .btn-export:hover { background: var(--azul-medio); }
+
+  /* ── Content ── */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 1.75rem 2rem;
+  }
+
+  /* KPI row */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
+
+  .kpi-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.25rem 1.25rem 1rem;
+    border: 1px solid var(--gris-borde);
+    box-shadow: 0 2px 6px rgba(0,48,135,0.05);
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn 0.4s ease both;
+  }
+
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .kpi-card.nps::after    { background: var(--azul); }
+  .kpi-card.promo::after  { background: var(--verde); }
+  .kpi-card.detract::after{ background: var(--rojo); }
+  .kpi-card.resenas::after{ background: var(--amarillo); }
+
+  .kpi-label { font-size: 11.5px; font-weight: 600; color: var(--subtexto); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .kpi-value { font-size: 32px; font-weight: 800; color: var(--texto); line-height: 1; }
+  .kpi-value.green { color: var(--verde); }
+  .kpi-value.red   { color: var(--rojo); }
+  .kpi-value.blue  { color: var(--azul); }
+
+  .kpi-delta {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600;
+    margin-top: 8px; padding: 3px 8px; border-radius: 20px;
+  }
+  .kpi-delta.up   { background: var(--verde-bg); color: var(--verde); }
+  .kpi-delta.down { background: var(--rojo-bg);  color: var(--rojo); }
+  .kpi-delta.warn { background: var(--naranja-bg); color: var(--naranja); }
+
+  .kpi-icon {
+    position: absolute; right: 14px; top: 14px;
+    opacity: 0.07;
+  }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .kpi-card:nth-child(1){ animation-delay:0.05s; }
+  .kpi-card:nth-child(2){ animation-delay:0.1s; }
+  .kpi-card:nth-child(3){ animation-delay:0.15s; }
+  .kpi-card:nth-child(4){ animation-delay:0.2s; }
+
+  /* Charts row */
+  .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+
+  .chart-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.25rem;
+    border: 1px solid var(--gris-borde);
+    box-shadow: 0 2px 6px rgba(0,48,135,0.05);
+  }
+
+  .chart-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .chart-title { font-size: 14px; font-weight: 700; color: var(--texto); }
+  .chart-subtitle { font-size: 12px; color: var(--subtexto); margin-top: 1px; }
+
+  .chart-legend {
+    display: flex; gap: 12px;
+  }
+
+  .legend-dot { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--subtexto); font-weight: 500; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  .canvas-wrap { position: relative; }
+
+  /* Bottom row */
+  .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  /* Pareto table */
+  .table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+
+  .issues-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .issue-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--gris-borde);
+    background: var(--gris-bg);
+    transition: background 0.15s;
+  }
+
+  .issue-item:hover { background: var(--azul-claro); }
+
+  .issue-rank {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: var(--azul);
+    color: white;
+    font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .issue-rank.top { background: var(--rojo); }
+
+  .issue-info { flex: 1; min-width: 0; }
+  .issue-name { font-size: 13px; font-weight: 600; color: var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .issue-area { font-size: 11px; color: var(--subtexto); }
+
+  .issue-bar-wrap { width: 90px; }
+  .issue-bar-bg { background: var(--gris-borde); border-radius: 4px; height: 6px; }
+  .issue-bar { height: 6px; border-radius: 4px; background: var(--azul); transition: width 0.6s ease; }
+  .issue-bar.red { background: var(--rojo); }
+  .issue-pct { font-size: 11px; font-weight: 700; color: var(--subtexto); text-align: right; margin-top: 3px; }
+
+  .issue-count {
+    background: var(--azul-claro);
+    color: var(--azul-medio);
+    font-size: 11.5px; font-weight: 700;
+    padding: 3px 8px; border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Recent reviews */
+  .review-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .review-item {
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--gris-borde);
+    background: var(--gris-bg);
+  }
+
+  .review-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .review-area { font-size: 11.5px; font-weight: 600; color: var(--subtexto); }
+  .review-time { font-size: 11px; color: #9BA5BE; }
+
+  .review-text { font-size: 13px; color: var(--texto); line-height: 1.45; margin-bottom: 7px; }
+
+  .review-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  .tag {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px;
+  }
+  .tag.promo   { background: var(--verde-bg);   color: var(--verde); }
+  .tag.detract { background: var(--rojo-bg);    color: var(--rojo); }
+  .tag.neutral { background: var(--naranja-bg); color: var(--naranja); }
+  .tag.domain  { background: var(--azul-claro); color: var(--azul-medio); }
+
+  .score-pill {
+    display: flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 8px;
+    font-size: 13px; font-weight: 800;
+  }
+  .score-pill.p { background: var(--verde-bg); color: var(--verde); }
+  .score-pill.d { background: var(--rojo-bg);  color: var(--rojo); }
+  .score-pill.n { background: var(--naranja-bg); color: var(--naranja); }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">C</div>
+    <div class="logo-name">
+      Coppel TI
+      <small>NPS Intelligence</small>
+    </div>
+  </div>
+
+  <div class="nav-section">Principal</div>
+  <div class="nav-item active">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </div>
+  <div class="nav-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Reseñas
+    <span class="nav-badge">12</span>
+  </div>
+  <div class="nav-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Análisis IA
+  </div>
+  <div class="nav-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+    Chatbot RAG
+  </div>
+
+  <div class="nav-section">Configuración</div>
+  <div class="nav-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+    Configuración
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-avatar">LH</div>
+    <div class="user-info">
+      <div class="name">L. Hernández</div>
+      <div class="role">Supervisor TI</div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Dashboard NPS — Soporte Técnico</h1>
+      <p>Última actualización: hace 4 minutos · Marzo 2026</p>
+    </div>
+    <div class="topbar-right">
+      <button class="filter-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Área: Soporte TI
+      </button>
+      <button class="filter-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Mar 2026
+      </button>
+      <button class="btn-export">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi-card nps">
+        <svg class="kpi-icon" width="70" height="70" viewBox="0 0 24 24" fill="#003087"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <div class="kpi-label">NPS Score</div>
+        <div class="kpi-value blue">+42</div>
+        <div class="kpi-delta up">↑ +7 pts vs mes anterior</div>
+      </div>
+      <div class="kpi-card promo">
+        <svg class="kpi-icon" width="70" height="70" viewBox="0 0 24 24" fill="#1B8A5A"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/></svg>
+        <div class="kpi-label">Promotores</div>
+        <div class="kpi-value green">61%</div>
+        <div class="kpi-delta up">↑ +4% vs mes anterior</div>
+      </div>
+      <div class="kpi-card detract">
+        <svg class="kpi-icon" width="70" height="70" viewBox="0 0 24 24" fill="#D32F2F"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3z"/></svg>
+        <div class="kpi-label">Detractores</div>
+        <div class="kpi-value red">19%</div>
+        <div class="kpi-delta down">↓ –3% vs mes anterior</div>
+      </div>
+      <div class="kpi-card resenas">
+        <svg class="kpi-icon" width="70" height="70" viewBox="0 0 24 24" fill="#FFB800"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <div class="kpi-label">Reseñas totales</div>
+        <div class="kpi-value">247</div>
+        <div class="kpi-delta warn">↑ +38 este mes</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Tendencia NPS — Últimos 6 meses</div>
+            <div class="chart-subtitle">Línea de tiempo mensual · Soporte Técnico</div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-dot"><span class="dot" style="background:#003087"></span>NPS</div>
+            <div class="legend-dot"><span class="dot" style="background:#1B8A5A"></span>Promotores</div>
+            <div class="legend-dot"><span class="dot" style="background:#D32F2F"></span>Detractores</div>
+          </div>
+        </div>
+        <div class="canvas-wrap" style="height:185px;">
+          <canvas id="npsChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Distribución actual</div>
+            <div class="chart-subtitle">Promotores · Neutrales · Detractores</div>
+          </div>
+        </div>
+        <div class="canvas-wrap" style="height:185px; display:flex; align-items:center; justify-content:center;">
+          <canvas id="donutChart" style="max-height:185px;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="bottom-row">
+      <!-- Pareto -->
+      <div class="chart-card">
+        <div class="table-header">
+          <div>
+            <div class="chart-title">Focos rojos — Análisis de Pareto</div>
+            <div class="chart-subtitle">Top causas por impacto en NPS</div>
+          </div>
+          <span style="font-size:11.5px;font-weight:700;color:var(--rojo);background:var(--rojo-bg);padding:3px 10px;border-radius:20px;">20% causas → 80% impacto</span>
+        </div>
+        <div class="issues-list">
+          <div class="issue-item">
+            <div class="issue-rank top">1</div>
+            <div class="issue-info">
+              <div class="issue-name">Tiempo de respuesta elevado</div>
+              <div class="issue-area">Soporte nivel 1 · Infraestructura</div>
+            </div>
+            <div class="issue-bar-wrap">
+              <div class="issue-bar-bg"><div class="issue-bar red" style="width:88%"></div></div>
+              <div class="issue-pct">88%</div>
+            </div>
+            <div class="issue-count">34</div>
+          </div>
+          <div class="issue-item">
+            <div class="issue-rank top">2</div>
+            <div class="issue-info">
+              <div class="issue-name">VPN sin acceso / caída</div>
+              <div class="issue-area">Conectividad · Redes</div>
+            </div>
+            <div class="issue-bar-wrap">
+              <div class="issue-bar-bg"><div class="issue-bar red" style="width:71%"></div></div>
+              <div class="issue-pct">71%</div>
+            </div>
+            <div class="issue-count">28</div>
+          </div>
+          <div class="issue-item">
+            <div class="issue-rank">3</div>
+            <div class="issue-info">
+              <div class="issue-name">Ticket sin actualización</div>
+              <div class="issue-area">Gestión · Seguimiento</div>
+            </div>
+            <div class="issue-bar-wrap">
+              <div class="issue-bar-bg"><div class="issue-bar" style="width:53%"></div></div>
+              <div class="issue-pct">53%</div>
+            </div>
+            <div class="issue-count">21</div>
+          </div>
+          <div class="issue-item">
+            <div class="issue-rank">4</div>
+            <div class="issue-info">
+              <div class="issue-name">Equipos sin mantenimiento</div>
+              <div class="issue-area">Hardware · Activos</div>
+            </div>
+            <div class="issue-bar-wrap">
+              <div class="issue-bar-bg"><div class="issue-bar" style="width:38%"></div></div>
+              <div class="issue-pct">38%</div>
+            </div>
+            <div class="issue-count">15</div>
+          </div>
+          <div class="issue-item">
+            <div class="issue-rank">5</div>
+            <div class="issue-info">
+              <div class="issue-name">Reset de contraseña lento</div>
+              <div class="issue-area">Accesos · Seguridad</div>
+            </div>
+            <div class="issue-bar-wrap">
+              <div class="issue-bar-bg"><div class="issue-bar" style="width:24%"></div></div>
+              <div class="issue-pct">24%</div>
+            </div>
+            <div class="issue-count">9</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent reviews -->
+      <div class="chart-card">
+        <div class="table-header">
+          <div>
+            <div class="chart-title">Reseñas recientes</div>
+            <div class="chart-subtitle">Procesadas por Gemini AI</div>
+          </div>
+          <span style="font-size:12px;color:var(--azul-medio);font-weight:600;cursor:pointer;">Ver todas →</span>
+        </div>
+        <div class="review-list">
+          <div class="review-item">
+            <div class="review-top">
+              <span class="review-area">Soporte TI · Infraestructura</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="review-time">hace 12 min</span>
+                <div class="score-pill p">9</div>
+              </div>
+            </div>
+            <div class="review-text">"El agente resolvió mi problema con el equipo en menos de 20 minutos, muy profesional."</div>
+            <div class="review-tags">
+              <span class="tag promo">Promotor</span>
+              <span class="tag domain">Hardware</span>
+            </div>
+          </div>
+          <div class="review-item">
+            <div class="review-top">
+              <span class="review-area">Soporte TI · Conectividad</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="review-time">hace 1 h</span>
+                <div class="score-pill d">3</div>
+              </div>
+            </div>
+            <div class="review-text">"Llevo dos días con el ticket abierto y la VPN sigue sin funcionar. Nadie me da seguimiento."</div>
+            <div class="review-tags">
+              <span class="tag detract">Detractor</span>
+              <span class="tag domain">VPN / Redes</span>
+            </div>
+          </div>
+          <div class="review-item">
+            <div class="review-top">
+              <span class="review-area">Soporte TI · Accesos</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="review-time">hace 3 h</span>
+                <div class="score-pill n">7</div>
+              </div>
+            </div>
+            <div class="review-text">"El reset tardó más de lo esperado pero al final lo resolvieron. Podría ser más rápido."</div>
+            <div class="review-tags">
+              <span class="tag neutral">Neutral</span>
+              <span class="tag domain">Contraseñas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// NPS trend chart
+const ctx1 = document.getElementById('npsChart').getContext('2d');
+new Chart(ctx1, {
+  type: 'line',
+  data: {
+    labels: ['Oct', 'Nov', 'Dic', 'Ene', 'Feb', 'Mar'],
+    datasets: [
+      {
+        label: 'NPS',
+        data: [28, 31, 25, 35, 38, 42],
+        borderColor: '#003087',
+        backgroundColor: 'rgba(0,48,135,0.08)',
+        borderWidth: 2.5,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#003087',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      },
+      {
+        label: 'Promotores %',
+        data: [52, 55, 49, 57, 59, 61],
+        borderColor: '#1B8A5A',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [5,4],
+        tension: 0.4,
+        fill: false,
+        pointBackgroundColor: '#1B8A5A',
+        pointRadius: 3,
+      },
+      {
+        label: 'Detractores %',
+        data: [24, 22, 26, 21, 22, 19],
+        borderColor: '#D32F2F',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [5,4],
+        tension: 0.4,
+        fill: false,
+        pointBackgroundColor: '#D32F2F',
+        pointRadius: 3,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1A2340',
+        titleFont: { family: 'Figtree', weight: '700' },
+        bodyFont: { family: 'Figtree' },
+        padding: 10,
+        cornerRadius: 8,
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'Figtree', size: 12 }, color: '#5A6480' } },
+      y: { grid: { color: '#EEF1F8' }, ticks: { font: { family: 'Figtree', size: 12 }, color: '#5A6480' } }
+    }
+  }
+});
+
+// Donut
+const ctx2 = document.getElementById('donutChart').getContext('2d');
+new Chart(ctx2, {
+  type: 'doughnut',
+  data: {
+    labels: ['Promotores', 'Neutrales', 'Detractores'],
+    datasets: [{
+      data: [61, 20, 19],
+      backgroundColor: ['#1B8A5A', '#F9A825', '#D32F2F'],
+      borderWidth: 0,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '68%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          font: { family: 'Figtree', size: 11.5, weight: '600' },
+          color: '#5A6480',
+          padding: 14,
+          usePointStyle: true,
+          pointStyleWidth: 8
+        }
+      },
+      tooltip: {
+        backgroundColor: '#1A2340',
+        titleFont: { family: 'Figtree', weight: '700' },
+        bodyFont: { family: 'Figtree' },
+        padding: 10,
+        cornerRadius: 8,
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

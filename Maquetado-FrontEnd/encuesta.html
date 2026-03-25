@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encuesta de Satisfacción · Coppel TI</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul: #003087;
+    --azul-medio: #0047BA;
+    --azul-claro: #E8F0FD;
+    --amarillo: #FFB800;
+    --amarillo-light: #FFF8E1;
+    --gris-bg: #F4F6FA;
+    --gris-borde: #DDE3EF;
+    --texto: #1A2340;
+    --subtexto: #5A6480;
+    --blanco: #FFFFFF;
+    --rojo: #D32F2F;
+    --verde: #1B8A5A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Figtree', sans-serif;
+    background: var(--gris-bg);
+    color: var(--texto);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: var(--azul);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--amarillo);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--azul);
+    letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    color: white;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.2px;
+  }
+
+  .logo-text span {
+    color: var(--amarillo);
+  }
+
+  .header-badge {
+    background: rgba(255,184,0,0.15);
+    border: 1px solid rgba(255,184,0,0.4);
+    color: var(--amarillo);
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    background: #D0D9EE;
+    height: 4px;
+    width: 100%;
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--amarillo);
+    width: 33%;
+    transition: width 0.4s ease;
+  }
+
+  /* Main layout */
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .survey-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .meta-tag {
+    background: var(--azul-claro);
+    color: var(--azul-medio);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .meta-ticket {
+    color: var(--subtexto);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .meta-ticket strong { color: var(--texto); }
+
+  /* Section cards */
+  .card {
+    background: var(--blanco);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--gris-borde);
+    box-shadow: 0 2px 8px rgba(0,48,135,0.06);
+    animation: slideUp 0.35s ease both;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card:nth-child(2) { animation-delay: 0.06s; }
+  .card:nth-child(3) { animation-delay: 0.12s; }
+  .card:nth-child(4) { animation-delay: 0.18s; }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  .section-num {
+    width: 26px;
+    height: 26px;
+    background: var(--azul);
+    color: white;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--texto);
+  }
+
+  .question-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--texto);
+    line-height: 1.45;
+    margin-bottom: 1.5rem;
+  }
+
+  .question-sub {
+    font-size: 13.5px;
+    color: var(--subtexto);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  /* NPS Scale */
+  .nps-scale {
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+    margin-bottom: 10px;
+  }
+
+  .nps-btn {
+    flex: 1;
+    aspect-ratio: 1;
+    border: 2px solid var(--gris-borde);
+    background: white;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--subtexto);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nps-btn:hover { border-color: var(--azul-medio); color: var(--azul-medio); transform: translateY(-2px); }
+
+  .nps-btn.detractor  { border-color: #FFCDD2; background: #FFF5F5; color: #C62828; }
+  .nps-btn.neutral    { border-color: #FFF8E1; background: #FFFDE7; color: #F57F17; }
+  .nps-btn.promotor   { border-color: #C8E6C9; background: #F1F8F1; color: #2E7D32; }
+
+  .nps-btn.selected.detractor  { background: #D32F2F; border-color: #D32F2F; color: white; }
+  .nps-btn.selected.neutral    { background: #F9A825; border-color: #F9A825; color: white; }
+  .nps-btn.selected.promotor   { background: #2E7D32; border-color: #2E7D32; color: white; }
+
+  .nps-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: var(--subtexto);
+    font-weight: 500;
+    padding: 0 2px;
+  }
+
+  .nps-labels .red  { color: #D32F2F; }
+  .nps-labels .green { color: #2E7D32; }
+
+  /* Textarea */
+  .textarea-wrap {
+    position: relative;
+  }
+
+  textarea {
+    width: 100%;
+    border: 2px solid var(--gris-borde);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 14.5px;
+    color: var(--texto);
+    resize: none;
+    min-height: 120px;
+    transition: border-color 0.2s;
+    background: var(--gris-bg);
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--azul-medio);
+    background: white;
+  }
+
+  textarea::placeholder { color: #9BA5BE; }
+
+  .char-count {
+    text-align: right;
+    font-size: 12px;
+    color: var(--subtexto);
+    margin-top: 6px;
+  }
+
+  /* Scale questions */
+  .scale-item {
+    margin-bottom: 1.5rem;
+  }
+
+  .scale-item:last-child { margin-bottom: 0; }
+
+  .scale-question {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--texto);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .scale-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .scale-label {
+    font-size: 12px;
+    color: var(--subtexto);
+    white-space: nowrap;
+    font-weight: 500;
+    min-width: 80px;
+  }
+  .scale-label.right { text-align: right; }
+
+  .scale-options {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .scale-opt {
+    width: 38px;
+    height: 38px;
+    border: 2px solid var(--gris-borde);
+    border-radius: 8px;
+    background: white;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--subtexto);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+  }
+
+  .scale-opt:hover  { border-color: var(--azul-medio); color: var(--azul-medio); }
+  .scale-opt.active { background: var(--azul); border-color: var(--azul); color: white; }
+
+  /* Submit */
+  .submit-wrap {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .step-info {
+    font-size: 13px;
+    color: var(--subtexto);
+    font-weight: 500;
+  }
+
+  .btn-primary {
+    background: var(--azul);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 28px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(0,48,135,0.25);
+  }
+
+  .btn-primary:hover {
+    background: var(--azul-medio);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0,71,186,0.3);
+  }
+
+  .btn-primary svg { transition: transform 0.2s; }
+  .btn-primary:hover svg { transform: translateX(3px); }
+
+  /* Info note */
+  .info-note {
+    background: var(--amarillo-light);
+    border-left: 3px solid var(--amarillo);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-top: 1.25rem;
+    font-size: 13px;
+    color: #7A5800;
+    line-height: 1.5;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">
+    <div class="logo-mark">C</div>
+    <span class="logo-text">Coppel <span>TI</span></span>
+  </div>
+  <div class="header-badge">NPS Soporte</div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<main class="container">
+
+  <div class="survey-meta">
+    <span class="meta-tag">Soporte Técnico</span>
+    <span class="meta-ticket">Ticket <strong>#TI-20847</strong> · Agente: L. Hernández</span>
+  </div>
+
+  <!-- Módulo 1: Recomendación -->
+  <div class="card">
+    <div class="section-label">
+      <div class="section-num">1</div>
+      <span class="section-title">Puntuación de recomendación</span>
+    </div>
+    <p class="question-text">
+      ¿Qué tan probable es que recomiendes el soporte técnico de Coppel TI a un compañero?
+      <span class="question-sub">Selecciona del 1 (nada probable) al 10 (muy probable)</span>
+    </p>
+
+    <div class="nps-scale" id="npsScale">
+      <button class="nps-btn detractor" data-val="1" onclick="selectNPS(this)">1</button>
+      <button class="nps-btn detractor" data-val="2" onclick="selectNPS(this)">2</button>
+      <button class="nps-btn detractor" data-val="3" onclick="selectNPS(this)">3</button>
+      <button class="nps-btn detractor" data-val="4" onclick="selectNPS(this)">4</button>
+      <button class="nps-btn detractor" data-val="5" onclick="selectNPS(this)">5</button>
+      <button class="nps-btn detractor" data-val="6" onclick="selectNPS(this)">6</button>
+      <button class="nps-btn neutral"   data-val="7" onclick="selectNPS(this)">7</button>
+      <button class="nps-btn neutral"   data-val="8" onclick="selectNPS(this)">8</button>
+      <button class="nps-btn promotor"  data-val="9" onclick="selectNPS(this)">9</button>
+      <button class="nps-btn promotor"  data-val="10" onclick="selectNPS(this)">10</button>
+    </div>
+    <div class="nps-labels">
+      <span class="red">Nada probable</span>
+      <span class="green">Muy probable</span>
+    </div>
+  </div>
+
+  <!-- Módulo 2: Justificación -->
+  <div class="card">
+    <div class="section-label">
+      <div class="section-num">2</div>
+      <span class="section-title">Comentario abierto</span>
+    </div>
+    <p class="question-text">
+      ¿Cuál es la razón principal de tu puntuación?
+      <span class="question-sub">Tu respuesta nos ayuda a identificar áreas de mejora</span>
+    </p>
+    <div class="textarea-wrap">
+      <textarea id="comentario" placeholder="Describe tu experiencia con el soporte recibido..." maxlength="500" oninput="updateCharCount()"></textarea>
+      <div class="char-count"><span id="charCount">0</span>/500</div>
+    </div>
+  </div>
+
+  <!-- Módulo 3: Escalas complementarias -->
+  <div class="card">
+    <div class="section-label">
+      <div class="section-num">3</div>
+      <span class="section-title">Preguntas complementarias</span>
+    </div>
+
+    <div class="scale-item">
+      <p class="scale-question">Tiempo de resolución del ticket</p>
+      <div class="scale-row">
+        <span class="scale-label">Muy lento</span>
+        <div class="scale-options">
+          <button class="scale-opt" onclick="selectScale(this, 'tiempo')">1</button>
+          <button class="scale-opt" onclick="selectScale(this, 'tiempo')">2</button>
+          <button class="scale-opt" onclick="selectScale(this, 'tiempo')">3</button>
+          <button class="scale-opt" onclick="selectScale(this, 'tiempo')">4</button>
+          <button class="scale-opt" onclick="selectScale(this, 'tiempo')">5</button>
+        </div>
+        <span class="scale-label right">Muy rápido</span>
+      </div>
+    </div>
+
+    <div class="scale-item">
+      <p class="scale-question">Claridad en la comunicación del agente</p>
+      <div class="scale-row">
+        <span class="scale-label">Nada clara</span>
+        <div class="scale-options">
+          <button class="scale-opt" onclick="selectScale(this, 'claridad')">1</button>
+          <button class="scale-opt" onclick="selectScale(this, 'claridad')">2</button>
+          <button class="scale-opt" onclick="selectScale(this, 'claridad')">3</button>
+          <button class="scale-opt" onclick="selectScale(this, 'claridad')">4</button>
+          <button class="scale-opt" onclick="selectScale(this, 'claridad')">5</button>
+        </div>
+        <span class="scale-label right">Muy clara</span>
+      </div>
+    </div>
+
+    <div class="scale-item">
+      <p class="scale-question">Solución efectiva de tu problema</p>
+      <div class="scale-row">
+        <span class="scale-label">Sin resolver</span>
+        <div class="scale-options">
+          <button class="scale-opt" onclick="selectScale(this, 'solucion')">1</button>
+          <button class="scale-opt" onclick="selectScale(this, 'solucion')">2</button>
+          <button class="scale-opt" onclick="selectScale(this, 'solucion')">3</button>
+          <button class="scale-opt" onclick="selectScale(this, 'solucion')">4</button>
+          <button class="scale-opt" onclick="selectScale(this, 'solucion')">5</button>
+        </div>
+        <span class="scale-label right">Resuelto al 100%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-note">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F9A825" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Tus respuestas son anónimas y se usan exclusivamente para mejorar el servicio de soporte técnico de Coppel TI.
+  </div>
+
+  <div class="submit-wrap" style="margin-top:1.5rem;">
+    <span class="step-info">Módulo 3 de 3</span>
+    <button class="btn-primary" onclick="submitForm()">
+      Enviar encuesta
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+
+</main>
+
+<script>
+  let npsVal = null;
+  const scaleVals = {};
+
+  function selectNPS(btn) {
+    document.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    npsVal = parseInt(btn.dataset.val);
+    updateProgress();
+  }
+
+  function selectScale(btn, group) {
+    btn.closest('.scale-options').querySelectorAll('.scale-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    scaleVals[group] = true;
+    updateProgress();
+  }
+
+  function updateCharCount() {
+    document.getElementById('charCount').textContent = document.getElementById('comentario').value.length;
+  }
+
+  function updateProgress() {
+    const filled = (npsVal ? 1 : 0)
+      + (document.getElementById('comentario').value.length > 0 ? 1 : 0)
+      + (Object.keys(scaleVals).length / 3);
+    const pct = Math.min(100, Math.round((filled / 3) * 100));
+    document.getElementById('progressBar').style.width = pct + '%';
+  }
+
+  document.getElementById('comentario').addEventListener('input', updateProgress);
+
+  function submitForm() {
+    window.location.href = 'confirmacion.html';
+  }
+</script>
+</body>
+</html>

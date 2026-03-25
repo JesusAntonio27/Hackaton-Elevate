@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatbot NPS · Coppel TI</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul:        #003087;
+    --azul-medio:  #0047BA;
+    --azul-claro:  #E8F0FD;
+    --azul-dark:   #001D5E;
+    --amarillo:    #FFB800;
+    --gris-bg:     #EEF1F8;
+    --gris-borde:  #DDE3EF;
+    --texto:       #1A2340;
+    --subtexto:    #5A6480;
+    --blanco:      #FFFFFF;
+    --verde:       #1B8A5A;
+    --verde-bg:    #E8F5EF;
+    --rojo:        #D32F2F;
+    --rojo-bg:     #FDECEA;
+    --naranja:     #E65100;
+    --sidebar-w:   220px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Figtree', sans-serif; background: var(--gris-bg); color: var(--texto); display: flex; height: 100vh; overflow: hidden; }
+
+  /* Sidebar */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--azul-dark);
+    display: flex; flex-direction: column;
+    flex-shrink: 0; height: 100vh; overflow: hidden;
+  }
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .logo-mark {
+    width: 34px; height: 34px; background: var(--amarillo); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; color: var(--azul); flex-shrink: 0;
+  }
+  .logo-name { color: white; font-weight: 700; font-size: 15px; line-height: 1.1; }
+  .logo-name small { display: block; color: rgba(255,255,255,0.45); font-size: 11px; font-weight: 500; }
+  .nav-section { padding: 14px 12px 6px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; margin: 1px 8px; border-radius: 8px;
+    color: rgba(255,255,255,0.6); font-size: 13.5px; font-weight: 500; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+  .nav-item.active { background: var(--azul-medio); color: white; font-weight: 600; }
+  .nav-badge { margin-left: auto; background: var(--rojo); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+  .sidebar-footer {
+    margin-top: auto; padding: 14px 16px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .user-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--azul-medio);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+  .user-info .name { font-size: 12.5px; font-weight: 600; color: white; }
+  .user-info .role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  /* Main */
+  .main { flex: 1; display: flex; overflow: hidden; }
+
+  /* Chat panel */
+  .chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--blanco);
+  }
+
+  .chat-header {
+    padding: 14px 1.5rem;
+    border-bottom: 1px solid var(--gris-borde);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+    background: white;
+  }
+
+  .chat-header-left { display: flex; align-items: center; gap: 12px; }
+
+  .bot-avatar {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--azul) 0%, var(--azul-medio) 100%);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .bot-name { font-size: 15px; font-weight: 800; color: var(--texto); }
+  .bot-sub  { font-size: 12px; color: var(--subtexto); }
+
+  .status-dot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--verde); font-weight: 600; }
+  .dot-green { width: 8px; height: 8px; border-radius: 50%; background: var(--verde); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+  .chat-info {
+    display: flex; gap: 10px;
+  }
+  .info-pill {
+    font-size: 11.5px; font-weight: 600;
+    padding: 4px 10px; border-radius: 20px;
+    background: var(--azul-claro); color: var(--azul-medio);
+  }
+
+  /* Messages */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: var(--gris-bg);
+  }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+    max-width: 82%;
+    animation: msgIn 0.25s ease both;
+  }
+
+  @keyframes msgIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+
+  .msg.bot { align-self: flex-start; }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+
+  .msg-avatar.bot-av {
+    background: linear-gradient(135deg, var(--azul) 0%, var(--azul-medio) 100%);
+  }
+  .msg-avatar.user-av {
+    background: var(--gris-borde);
+    color: var(--subtexto);
+    font-size: 12px; font-weight: 700;
+  }
+
+  .msg-bubble {
+    border-radius: 14px;
+    padding: 12px 15px;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .msg.bot .msg-bubble {
+    background: white;
+    border: 1px solid var(--gris-borde);
+    color: var(--texto);
+    border-top-left-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,48,135,0.05);
+  }
+
+  .msg.user .msg-bubble {
+    background: var(--azul);
+    color: white;
+    border-top-right-radius: 4px;
+  }
+
+  .msg-time { font-size: 11px; color: var(--subtexto); margin-top: 5px; }
+  .msg.user .msg-time { text-align: right; }
+
+  /* Insight card inside bubble */
+  .insight-card {
+    background: var(--gris-bg);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    border-left: 3px solid var(--azul-medio);
+  }
+  .insight-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--azul-medio); margin-bottom: 6px; }
+  .insight-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .insight-key { font-size: 12.5px; color: var(--subtexto); }
+  .insight-val { font-size: 12.5px; font-weight: 700; color: var(--texto); }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px; margin: 2px;
+  }
+  .tag.red   { background: var(--rojo-bg);  color: var(--rojo); }
+  .tag.blue  { background: var(--azul-claro); color: var(--azul-medio); }
+  .tag.green { background: var(--verde-bg); color: var(--verde); }
+
+  /* Suggestions */
+  .suggestions {
+    padding: 10px 1.5rem 0;
+    display: flex; gap: 8px; flex-wrap: wrap;
+    background: var(--gris-bg);
+  }
+
+  .sugg-btn {
+    border: 1.5px solid var(--gris-borde);
+    background: white;
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 12.5px; font-weight: 600; color: var(--texto);
+    cursor: pointer; transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .sugg-btn:hover { border-color: var(--azul-medio); color: var(--azul-medio); background: var(--azul-claro); }
+
+  /* Input */
+  .chat-input-wrap {
+    padding: 1rem 1.5rem;
+    background: white;
+    border-top: 1px solid var(--gris-borde);
+    flex-shrink: 0;
+  }
+
+  .input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    background: var(--gris-bg);
+    border: 2px solid var(--gris-borde);
+    border-radius: 14px;
+    padding: 10px 10px 10px 16px;
+    transition: border-color 0.2s;
+  }
+  .input-row:focus-within { border-color: var(--azul-medio); background: white; }
+
+  .chat-textarea {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Figtree', sans-serif;
+    font-size: 14px; color: var(--texto);
+    resize: none;
+    max-height: 100px;
+    line-height: 1.5;
+    outline: none;
+  }
+  .chat-textarea::placeholder { color: #9BA5BE; }
+
+  .send-btn {
+    width: 36px; height: 36px;
+    background: var(--azul);
+    border: none; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--azul-medio); transform: scale(1.05); }
+
+  /* Right panel */
+  .right-panel {
+    width: 290px;
+    flex-shrink: 0;
+    background: white;
+    border-left: 1px solid var(--gris-borde);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .rp-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--gris-borde);
+    font-size: 13.5px; font-weight: 700; color: var(--texto);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .rp-body {
+    flex: 1; overflow-y: auto; padding: 14px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+
+  .source-card {
+    border: 1px solid var(--gris-borde);
+    border-radius: 10px;
+    padding: 11px 12px;
+    background: var(--gris-bg);
+  }
+  .source-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .source-id { font-size: 11px; font-weight: 700; color: var(--azul-medio); }
+  .source-score { font-size: 11px; font-weight: 700; }
+  .source-text { font-size: 12.5px; color: var(--texto); line-height: 1.45; margin-bottom: 6px; }
+  .source-meta { font-size: 11px; color: var(--subtexto); }
+
+  .rp-stats {
+    padding: 14px;
+    border-top: 1px solid var(--gris-borde);
+    flex-shrink: 0;
+  }
+  .rp-stats-title { font-size: 12px; font-weight: 700; color: var(--subtexto); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .stat-label { font-size: 12.5px; color: var(--subtexto); }
+  .stat-val   { font-size: 12.5px; font-weight: 700; color: var(--texto); }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">C</div>
+    <div class="logo-name">
+      Coppel TI
+      <small>NPS Intelligence</small>
+    </div>
+  </div>
+  <div class="nav-section">Principal</div>
+  <div class="nav-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </div>
+  <div class="nav-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+    Reseñas
+    <span class="nav-badge">12</span>
+  </div>
+  <div class="nav-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Análisis IA
+  </div>
+  <div class="nav-item active">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Chatbot RAG
+  </div>
+  <div class="nav-section">Configuración</div>
+  <div class="nav-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+    Configuración
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-avatar">LH</div>
+    <div class="user-info">
+      <div class="name">L. Hernández</div>
+      <div class="role">Supervisor TI</div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main chat -->
+<div class="main">
+  <div class="chat-panel">
+    <!-- Chat header -->
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <div class="bot-avatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <div>
+          <div class="bot-name">NPS Assistant</div>
+          <div class="bot-sub">Impulsado por Gemini · RAG sobre reseñas reales</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="status-dot"><span class="dot-green"></span>En línea</div>
+        <div class="chat-info">
+          <span class="info-pill">~50 reseñas indexadas</span>
+          <span class="info-pill">Soporte TI</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages" id="messages">
+
+      <!-- Bot greeting -->
+      <div class="msg bot">
+        <div class="msg-avatar bot-av">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <div class="msg-bubble">
+            👋 Hola, soy el <strong>NPS Assistant</strong> de Coppel TI.<br><br>
+            Puedo ayudarte a identificar patrones en las reseñas de soporte, encontrar las causas raíz de los detractores y generar insights accionables basados en las encuestas recientes.<br><br>
+            ¿Qué quieres analizar hoy?
+          </div>
+          <div class="msg-time">09:42 a.m.</div>
+        </div>
+      </div>
+
+      <!-- User message -->
+      <div class="msg user">
+        <div class="msg-avatar user-av">LH</div>
+        <div>
+          <div class="msg-bubble">¿Cuáles son las principales causas de detracción en el área de soporte técnico este mes?</div>
+          <div class="msg-time">09:44 a.m.</div>
+        </div>
+      </div>
+
+      <!-- Bot response with insight card -->
+      <div class="msg bot">
+        <div class="msg-avatar bot-av">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <div class="msg-bubble">
+            Analicé las últimas <strong>47 reseñas</strong> del área de Soporte TI. Identifiqué <strong>3 causas principales</strong> que concentran el <strong>79% del impacto negativo en NPS</strong>:
+
+            <div class="insight-card">
+              <div class="insight-label">🔴 Focos Rojos — Análisis de Pareto</div>
+              <div class="insight-row">
+                <span class="insight-key">1. Tiempo de respuesta</span>
+                <span class="insight-val">34 menciones</span>
+              </div>
+              <div class="insight-row">
+                <span class="insight-key">2. VPN / Conectividad</span>
+                <span class="insight-val">28 menciones</span>
+              </div>
+              <div class="insight-row">
+                <span class="insight-key">3. Seguimiento de tickets</span>
+                <span class="insight-val">21 menciones</span>
+              </div>
+            </div>
+
+            Los colaboradores de <strong>Logística</strong> y <strong>Cajas</strong> son los que más mencionan el tiempo de respuesta como problema crítico. Te recomiendo revisar los tickets con más de 24 h sin actualización.
+          </div>
+          <div style="margin-top:6px;">
+            <span class="tag blue">RAG · 12 fuentes</span>
+            <span class="tag red">Dominio: Infraestructura</span>
+            <span class="tag red">Dominio: Conectividad</span>
+          </div>
+          <div class="msg-time">09:44 a.m.</div>
+        </div>
+      </div>
+
+      <!-- User -->
+      <div class="msg user">
+        <div class="msg-avatar user-av">LH</div>
+        <div>
+          <div class="msg-bubble">¿Hay alguna mejora notable respecto al mes anterior?</div>
+          <div class="msg-time">09:46 a.m.</div>
+        </div>
+      </div>
+
+      <!-- Bot -->
+      <div class="msg bot">
+        <div class="msg-avatar bot-av">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <div class="msg-bubble">
+            Sí, hay una mejora relevante. Comparando con febrero:<br><br>
+            ✅ Las menciones de <strong>"reset de contraseña lento"</strong> bajaron de 18 a 9 (-50%). Probablemente relacionado con la automatización del portal de accesos.<br><br>
+            ✅ El NPS general subió de <strong>+38 a +42</strong>, impulsado por un aumento en promotores del área de Hardware.
+            <div class="insight-card">
+              <div class="insight-label">📈 Comparativo Feb → Mar 2026</div>
+              <div class="insight-row"><span class="insight-key">NPS Score</span><span class="insight-val" style="color:#1B8A5A">+38 → +42 ↑</span></div>
+              <div class="insight-row"><span class="insight-key">Promotores</span><span class="insight-val" style="color:#1B8A5A">59% → 61% ↑</span></div>
+              <div class="insight-row"><span class="insight-key">Detractores</span><span class="insight-val" style="color:#1B8A5A">22% → 19% ↓</span></div>
+            </div>
+          </div>
+          <div style="margin-top:6px;">
+            <span class="tag blue">RAG · 8 fuentes</span>
+            <span class="tag green">Dominio: Accesos</span>
+          </div>
+          <div class="msg-time">09:46 a.m.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Suggestions -->
+    <div class="suggestions" id="suggestions">
+      <button class="sugg-btn" onclick="selectSugg(this)">¿Qué departamento tiene más detractores?</button>
+      <button class="sugg-btn" onclick="selectSugg(this)">Resumen ejecutivo del mes</button>
+      <button class="sugg-btn" onclick="selectSugg(this)">Acciones recomendadas para VPN</button>
+      <button class="sugg-btn" onclick="selectSugg(this)">Top 3 agentes con mejor NPS</button>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-wrap">
+      <div class="input-row">
+        <textarea class="chat-textarea" id="chatInput" rows="1" placeholder="Pregunta sobre el NPS, detractores, tendencias…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="sendMessage()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel: Sources -->
+  <div class="right-panel">
+    <div class="rp-header">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Fuentes RAG · Última consulta
+    </div>
+    <div class="rp-body">
+      <div class="source-card">
+        <div class="source-top">
+          <span class="source-id">Reseña #R-0041</span>
+          <span class="source-score" style="color:var(--rojo)">Score: 2 · Detractor</span>
+        </div>
+        <div class="source-text">"Tardaron 3 días en resolver mi problema con la VPN. El ticket estuvo sin actualización por más de 48 horas."</div>
+        <div class="source-meta">Área: Conectividad · 14 Mar 2026</div>
+      </div>
+      <div class="source-card">
+        <div class="source-top">
+          <span class="source-id">Reseña #R-0038</span>
+          <span class="source-score" style="color:var(--rojo)">Score: 4 · Detractor</span>
+        </div>
+        <div class="source-text">"El soporte tardó mucho en responder, mi solicitud fue urgente y no hubo priorización."</div>
+        <div class="source-meta">Área: Infraestructura · 12 Mar 2026</div>
+      </div>
+      <div class="source-card">
+        <div class="source-top">
+          <span class="source-id">Reseña #R-0035</span>
+          <span class="source-score" style="color:var(--naranja)">Score: 7 · Neutral</span>
+        </div>
+        <div class="source-text">"Se resolvió pero la comunicación durante el proceso fue confusa, no sabía en qué estado estaba mi ticket."</div>
+        <div class="source-meta">Área: Gestión · 10 Mar 2026</div>
+      </div>
+      <div class="source-card">
+        <div class="source-top">
+          <span class="source-id">Reseña #R-0029</span>
+          <span class="source-score" style="color:var(--rojo)">Score: 3 · Detractor</span>
+        </div>
+        <div class="source-text">"VPN sin funcionar por dos días, afectó directamente mi trabajo en home office. Necesita atención urgente."</div>
+        <div class="source-meta">Área: Conectividad · 8 Mar 2026</div>
+      </div>
+    </div>
+    <div class="rp-stats">
+      <div class="rp-stats-title">Contexto de la sesión</div>
+      <div class="stat-row"><span class="stat-label">Reseñas analizadas</span><span class="stat-val">47</span></div>
+      <div class="stat-row"><span class="stat-label">Consultas realizadas</span><span class="stat-val">4</span></div>
+      <div class="stat-row"><span class="stat-label">Modelo</span><span class="stat-val">Gemini 2.0</span></div>
+      <div class="stat-row"><span class="stat-label">Embeddings</span><span class="stat-val">Gemini Emb. 2</span></div>
+      <div class="stat-row"><span class="stat-label">Base de datos</span><span class="stat-val">Firestore</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function selectSugg(btn) {
+  document.getElementById('chatInput').value = btn.textContent;
+  autoResize(document.getElementById('chatInput'));
+  btn.remove();
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const msgs = document.getElementById('messages');
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'msg user';
+  userMsg.innerHTML = `
+    <div class="msg-avatar user-av">LH</div>
+    <div>
+      <div class="msg-bubble">${text}</div>
+      <div class="msg-time">${new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'})}</div>
+    </div>`;
+  msgs.appendChild(userMsg);
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Typing indicator
+  const typing = document.createElement('div');
+  typing.className = 'msg bot';
+  typing.id = 'typing';
+  typing.innerHTML = `
+    <div class="msg-avatar bot-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+    <div><div class="msg-bubble" style="color:#9BA5BE;font-style:italic;">Consultando reseñas…</div></div>`;
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  setTimeout(() => {
+    typing.remove();
+    const botMsg = document.createElement('div');
+    botMsg.className = 'msg bot';
+    botMsg.innerHTML = `
+      <div class="msg-avatar bot-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div>
+        <div class="msg-bubble">Basado en las reseñas indexadas, he identificado patrones relevantes para tu consulta. Te recomiendo revisar el análisis de Pareto en el Dashboard para ver el desglose completo por área e impacto en NPS.</div>
+        <div style="margin-top:6px;"><span class="tag blue">RAG · 6 fuentes</span></div>
+        <div class="msg-time">${new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'})}</div>
+      </div>`;
+    msgs.appendChild(botMsg);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1500);
+}
+</script>
+</body>
+</html>
