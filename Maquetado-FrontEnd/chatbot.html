@@ -162,6 +162,41 @@
     font-size: 14px;
     line-height: 1.55;
   }
+  .msg-bubble h2, .msg-bubble h3, .msg-bubble h4, .msg-bubble h5 {
+    margin: 8px 0 6px;
+    color: var(--texto);
+    line-height: 1.3;
+  }
+  .msg-bubble h2 { font-size: 16px; }
+  .msg-bubble h3 { font-size: 15px; }
+  .msg-bubble h4, .msg-bubble h5 { font-size: 14px; }
+  .msg-bubble ul { margin: 6px 0 8px 18px; }
+  .msg-bubble li { margin: 2px 0; }
+  .msg-bubble code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: rgba(0,0,0,0.06);
+    border-radius: 5px;
+    padding: 1px 5px;
+    font-size: 12px;
+  }
+  .msg-bubble hr {
+    border: 0;
+    border-top: 1px solid var(--gris-borde);
+    margin: 10px 0;
+  }
+  .msg-bubble table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 12.5px;
+  }
+  .msg-bubble th, .msg-bubble td {
+    border: 1px solid var(--gris-borde);
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .msg-bubble th { background: #f5f7fb; font-weight: 700; }
 
   .msg.bot .msg-bubble {
     background: white;
@@ -192,6 +227,14 @@
   .insight-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .insight-key { font-size: 12.5px; color: var(--subtexto); }
   .insight-val { font-size: 12.5px; font-weight: 700; color: var(--texto); }
+  .pareto-mini-chart { margin-bottom: 10px; }
+  .pareto-mini-row { display: grid; grid-template-columns: 1fr 120px 34px; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .pareto-mini-label { font-size: 11.5px; color: var(--subtexto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pareto-mini-bar-bg { height: 6px; background: var(--gris-borde); border-radius: 10px; overflow: hidden; }
+  .pareto-mini-bar { height: 100%; background: var(--azul-medio); border-radius: 10px; transition: width .6s ease; }
+  .pareto-mini-bar.top { background: var(--rojo); }
+  .pareto-mini-val { font-size: 11px; font-weight: 700; color: var(--texto); text-align: right; }
+  .pareto-mini-analysis { margin-top: 6px; font-size: 12px; color: var(--texto); line-height: 1.45; }
 
   .tag {
     display: inline-block;
@@ -321,23 +364,14 @@
     </div>
   </div>
   <div class="nav-section">Principal</div>
-  <div class="nav-item">
+  <a href="dashboard.html" class="nav-item" style="text-decoration: none;">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
     Dashboard
-  </div>
-  <div class="nav-item">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
-    Reseñas
-    <span class="nav-badge">12</span>
-  </div>
-  <div class="nav-item">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    Análisis IA
-  </div>
-  <div class="nav-item active">
+  </a>
+  <a href="chatbot.html" class="nav-item active" style="text-decoration: none;">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Chatbot RAG
-  </div>
+  </a>
   <div class="nav-section">Configuración</div>
   <div class="nav-item">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
@@ -544,6 +578,7 @@
   </div>
 </div>
 
+<script src="./ui-elements/generative-ui.js"></script>
 <script>
 function autoResize(el) {
   el.style.height = 'auto';
@@ -563,13 +598,8 @@ function selectSugg(btn) {
   btn.remove();
 }
 
-function sendMessage() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-
+function appendUserMessage(text) {
   const msgs = document.getElementById('messages');
-
   const userMsg = document.createElement('div');
   userMsg.className = 'msg user';
   userMsg.innerHTML = `
@@ -579,11 +609,11 @@ function sendMessage() {
       <div class="msg-time">${new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'})}</div>
     </div>`;
   msgs.appendChild(userMsg);
+  msgs.scrollTop = msgs.scrollHeight;
+}
 
-  input.value = '';
-  input.style.height = 'auto';
-
-  // Typing indicator
+function showTyping() {
+  const msgs = document.getElementById('messages');
   const typing = document.createElement('div');
   typing.className = 'msg bot';
   typing.id = 'typing';
@@ -592,21 +622,82 @@ function sendMessage() {
     <div><div class="msg-bubble" style="color:#9BA5BE;font-style:italic;">Consultando reseñas…</div></div>`;
   msgs.appendChild(typing);
   msgs.scrollTop = msgs.scrollHeight;
+}
 
-  setTimeout(() => {
-    typing.remove();
-    const botMsg = document.createElement('div');
-    botMsg.className = 'msg bot';
-    botMsg.innerHTML = `
-      <div class="msg-avatar bot-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-      <div>
-        <div class="msg-bubble">Basado en las reseñas indexadas, he identificado patrones relevantes para tu consulta. Te recomiendo revisar el análisis de Pareto en el Dashboard para ver el desglose completo por área e impacto en NPS.</div>
-        <div style="margin-top:6px;"><span class="tag blue">RAG · 6 fuentes</span></div>
-        <div class="msg-time">${new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'})}</div>
-      </div>`;
-    msgs.appendChild(botMsg);
-    msgs.scrollTop = msgs.scrollHeight;
-  }, 1500);
+function hideTyping() {
+  const typing = document.getElementById('typing');
+  if (typing) typing.remove();
+}
+
+const GENIUS_BASE_URL = 'https://api.genius.coppel.services';
+const GENIUS_MODEL = 'gemini/gemini-3-flash-preview';
+
+function getApiKeyLocal() {
+  return 'sk-vOavmAHlaCWHfMVWLxfJig'; // Injected from .env for demo purposes
+}
+
+function renderBotPlainText(texto) {
+  ChatbotUI.renderizarRespuestaIA({
+    mensaje_principal: texto,
+    ui_type: 'generic',
+    ui_data: {
+      descripcion: '',
+      etiquetas_tags: [{ color: 'blue', texto: `Modelo: ${GENIUS_MODEL}` }]
+    }
+  });
+}
+
+async function consultarGeniusDirecto(textoUsuario) {
+  const apiKey = getApiKeyLocal();
+  if (!apiKey) {
+    throw new Error('No se proporciono API key.');
+  }
+
+  const response = await fetch(`${GENIUS_BASE_URL}/v1/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: GENIUS_MODEL,
+      messages: [
+        { role: 'system', content: 'Eres un asistente de prueba para validar conectividad de chat.' },
+        { role: 'user', content: textoUsuario }
+      ],
+      temperature: 0.3
+    })
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorBody}`);
+  }
+
+  const data = await response.json();
+  return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  appendUserMessage(text);
+
+  input.value = '';
+  input.style.height = 'auto';
+  showTyping();
+
+  try {
+    const respuestaTexto = await consultarGeniusDirecto(text);
+    hideTyping();
+    renderBotPlainText(respuestaTexto || 'Respuesta vacia del modelo.');
+    ChatbotUI.actualizarFuentesRAG([]);
+  } catch (error) {
+    hideTyping();
+    ChatbotUI.renderErrorBot(`No fue posible chatear con Genius API. ${error.message}`);
+  }
 }
 </script>
 </body>
