@@ -33,11 +33,11 @@
   /* Header */
   .header {
     background: var(--azul);
-    padding: 0 2rem;
-    height: 64px;
+    padding: 0 1rem;
+    height: 70px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -229,6 +229,8 @@
   .nps-btn.selected.detractor  { background: #D32F2F; border-color: #D32F2F; color: white; }
   .nps-btn.selected.neutral    { background: #F9A825; border-color: #F9A825; color: white; }
   .nps-btn.selected.promotor   { background: #2E7D32; border-color: #2E7D32; color: white; }
+  /* Neutral selected state for complementary questions */
+  .nps-btn.selected { background: var(--azul); border-color: var(--azul); color: white; }
 
   .nps-labels {
     display: flex;
@@ -392,129 +394,34 @@
 <body>
 
 <header class="header">
-  <div class="header-logo">
-    <div class="logo-mark">C</div>
-    <span class="logo-text">Coppel <span>TI</span></span>
+  <div class="header-logo" style="margin: 0; padding: 0;">
+    <img src="Logo-NPS-Sentinel.svg" alt="NPS Sentinel Logo" style="height: 70px; width: auto; display: block;">
   </div>
-  <div class="header-badge">NPS Soporte</div>
+  <div class="header-badge" id="headerBadge">NPS Carga...</div>
 </header>
 
 <div class="progress-wrap">
   <div class="progress-bar" id="progressBar"></div>
 </div>
 
-<main class="container">
+<main class="container" id="surveyContainer" style="display:none;">
 
   <div class="survey-meta">
-    <span class="meta-tag">Soporte Técnico</span>
+    <span class="meta-tag" id="areaName">Cargando...</span>
     <span class="meta-ticket">Ticket <strong>#TI-20847</strong> · Agente: L. Hernández</span>
   </div>
 
-  <!-- Módulo 1: Recomendación -->
-  <div class="card">
-    <div class="section-label">
-      <div class="section-num">1</div>
-      <span class="section-title">Puntuación de recomendación</span>
-    </div>
-    <p class="question-text">
-      ¿Qué tan probable es que recomiendes el soporte técnico de Coppel TI a un compañero?
-      <span class="question-sub">Selecciona del 1 (nada probable) al 10 (muy probable)</span>
-    </p>
-
-    <div class="nps-scale" id="npsScale">
-      <button class="nps-btn detractor" data-val="1" onclick="selectNPS(this)">1</button>
-      <button class="nps-btn detractor" data-val="2" onclick="selectNPS(this)">2</button>
-      <button class="nps-btn detractor" data-val="3" onclick="selectNPS(this)">3</button>
-      <button class="nps-btn detractor" data-val="4" onclick="selectNPS(this)">4</button>
-      <button class="nps-btn detractor" data-val="5" onclick="selectNPS(this)">5</button>
-      <button class="nps-btn detractor" data-val="6" onclick="selectNPS(this)">6</button>
-      <button class="nps-btn neutral"   data-val="7" onclick="selectNPS(this)">7</button>
-      <button class="nps-btn neutral"   data-val="8" onclick="selectNPS(this)">8</button>
-      <button class="nps-btn promotor"  data-val="9" onclick="selectNPS(this)">9</button>
-      <button class="nps-btn promotor"  data-val="10" onclick="selectNPS(this)">10</button>
-    </div>
-    <div class="nps-labels">
-      <span class="red">Nada probable</span>
-      <span class="green">Muy probable</span>
-    </div>
-  </div>
-
-  <!-- Módulo 2: Justificación -->
-  <div class="card">
-    <div class="section-label">
-      <div class="section-num">2</div>
-      <span class="section-title">Comentario abierto</span>
-    </div>
-    <p class="question-text">
-      ¿Cuál es la razón principal de tu puntuación?
-      <span class="question-sub">Tu respuesta nos ayuda a identificar áreas de mejora</span>
-    </p>
-    <div class="textarea-wrap">
-      <textarea id="comentario" placeholder="Describe tu experiencia con el soporte recibido..." maxlength="500" oninput="updateCharCount()"></textarea>
-      <div class="char-count"><span id="charCount">0</span>/500</div>
-    </div>
-  </div>
-
-  <!-- Módulo 3: Escalas complementarias -->
-  <div class="card">
-    <div class="section-label">
-      <div class="section-num">3</div>
-      <span class="section-title">Preguntas complementarias</span>
-    </div>
-
-    <div class="scale-item">
-      <p class="scale-question">Tiempo de resolución del ticket</p>
-      <div class="scale-row">
-        <span class="scale-label">Muy lento</span>
-        <div class="scale-options">
-          <button class="scale-opt" onclick="selectScale(this, 'tiempo')">1</button>
-          <button class="scale-opt" onclick="selectScale(this, 'tiempo')">2</button>
-          <button class="scale-opt" onclick="selectScale(this, 'tiempo')">3</button>
-          <button class="scale-opt" onclick="selectScale(this, 'tiempo')">4</button>
-          <button class="scale-opt" onclick="selectScale(this, 'tiempo')">5</button>
-        </div>
-        <span class="scale-label right">Muy rápido</span>
-      </div>
-    </div>
-
-    <div class="scale-item">
-      <p class="scale-question">Claridad en la comunicación del agente</p>
-      <div class="scale-row">
-        <span class="scale-label">Nada clara</span>
-        <div class="scale-options">
-          <button class="scale-opt" onclick="selectScale(this, 'claridad')">1</button>
-          <button class="scale-opt" onclick="selectScale(this, 'claridad')">2</button>
-          <button class="scale-opt" onclick="selectScale(this, 'claridad')">3</button>
-          <button class="scale-opt" onclick="selectScale(this, 'claridad')">4</button>
-          <button class="scale-opt" onclick="selectScale(this, 'claridad')">5</button>
-        </div>
-        <span class="scale-label right">Muy clara</span>
-      </div>
-    </div>
-
-    <div class="scale-item">
-      <p class="scale-question">Solución efectiva de tu problema</p>
-      <div class="scale-row">
-        <span class="scale-label">Sin resolver</span>
-        <div class="scale-options">
-          <button class="scale-opt" onclick="selectScale(this, 'solucion')">1</button>
-          <button class="scale-opt" onclick="selectScale(this, 'solucion')">2</button>
-          <button class="scale-opt" onclick="selectScale(this, 'solucion')">3</button>
-          <button class="scale-opt" onclick="selectScale(this, 'solucion')">4</button>
-          <button class="scale-opt" onclick="selectScale(this, 'solucion')">5</button>
-        </div>
-        <span class="scale-label right">Resuelto al 100%</span>
-      </div>
-    </div>
+  <div id="dynamicQuestions">
+    <!-- Questions will be injected here -->
   </div>
 
   <div class="info-note">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F9A825" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    Tus respuestas son anónimas y se usan exclusivamente para mejorar el servicio de soporte técnico de Coppel TI.
+    Tus respuestas son anónimas y se usan exclusivamente para mejorar el servicio de <span id="infoArea">Coppel TI</span>.
   </div>
 
   <div class="submit-wrap" style="margin-top:1.5rem;">
-    <span class="step-info">Módulo 3 de 3</span>
+    <span class="step-info" id="stepCounter">Módulo 1 de 1</span>
     <button class="btn-primary" onclick="submitForm()">
       Enviar encuesta
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -523,40 +430,196 @@
 
 </main>
 
+<div id="errorMessage" style="display:none; text-align:center; padding: 4rem 2rem;">
+  <h2 style="color: var(--rojo);">Error al cargar la encuesta</h2>
+  <p style="color: var(--subtexto); margin-top: 1rem;">No se pudo encontrar la configuración para esta área.</p>
+</div>
+
 <script>
+  const configMap = {
+    "soporte": "soporte",
+    "tienda": "retail",
+    "app": "app"
+  };
+
+  let surveyConfig = null;
   let npsVal = null;
   const scaleVals = {};
+  const responses = {
+    nps: null,
+    comentario: "",
+    sugerencias: "",
+    complementary: {}
+  };
+
+  window.addEventListener('DOMContentLoaded', initSurvey);
+
+  async function initSurvey() {
+    const params = new URLSearchParams(window.location.search);
+    const version = params.get('v') || 'soporte';
+    const jsonFile = configMap[version] || version;
+
+    try {
+      const response = await fetch(`../JSONS-Encuestas/${jsonFile}.json`);
+      if (!response.ok) throw new Error('Not found');
+      surveyConfig = await response.json();
+      renderSurvey();
+    } catch (err) {
+      document.getElementById('errorMessage').style.display = 'block';
+      console.error(err);
+    }
+  }
+
+  function renderSurvey() {
+    const container = document.getElementById('dynamicQuestions');
+    document.getElementById('headerBadge').textContent = `NPS ${surveyConfig.area}`;
+    document.getElementById('areaName').textContent = surveyConfig.area;
+    document.getElementById('infoArea').textContent = surveyConfig.area;
+    
+    let html = '';
+    let currentStep = 1;
+
+    // 1. NPS (Core)
+    html += `
+      <div class="card">
+        <div class="section-label">
+          <div class="section-num">${currentStep++}</div>
+          <span class="section-title">Puntuación de recomendación</span>
+        </div>
+        <p class="question-text">
+          ¿Qué tan probable es que recomiendes el servicio de <strong>${surveyConfig.area}</strong> a un compañero?
+          <span class="question-sub">Selecciona del 1 (nada probable) al 10 (muy probable)</span>
+        </p>
+        <div class="nps-scale" id="npsScale">
+          ${[1,2,3,4,5,6,7,8,9,10].map(v => `
+            <button class="nps-btn ${v<=6?'detractor':v<=8?'neutral':'promotor'}" data-val="${v}" onclick="selectNPS(this)">${v}</button>
+          `).join('')}
+        </div>
+        <div class="nps-labels">
+          <span class="red">Nada probable</span>
+          <span class="green">Muy probable</span>
+        </div>
+      </div>
+    `;
+
+    // 2. Justificación (Core)
+    html += `
+      <div class="card">
+        <div class="section-label">
+          <div class="section-num">${currentStep++}</div>
+          <span class="section-title">Comentario abierto</span>
+        </div>
+        <p class="question-text">
+          ¿Cuál es la razón principal de tu puntuación?
+          <span class="question-sub">Tu respuesta nos ayuda a identificar áreas de mejora</span>
+        </p>
+        <div class="textarea-wrap">
+          <textarea id="comentario" placeholder="Describe tu experiencia..." maxlength="500" oninput="updateCoreResponse('comentario', this.value)"></textarea>
+          <div class="char-count"><span id="charCount">0</span>/500</div>
+        </div>
+      </div>
+    `;
+
+    // 3. Complementary (Dynamic)
+    if (surveyConfig.questions && surveyConfig.questions.length > 0) {
+      html += `
+        <div class="card">
+          <div class="section-label">
+            <div class="section-num">${currentStep++}</div>
+            <span class="section-title">Preguntas complementarias</span>
+          </div>
+          ${surveyConfig.questions.map(q => `
+            <div class="complementary-item mb-5">
+              <p class="question-text">
+                ${q.text}
+                <span class="question-sub">Selecciona del 1 al 10</span>
+              </p>
+              <div class="nps-scale">
+                ${[1,2,3,4,5,6,7,8,9,10].map(v => `
+                  <button class="nps-btn" onclick="selectScale(this, '${q.id}')">${v}</button>
+                `).join('')}
+              </div>
+              <div class="nps-labels">
+                <span>${q.min_label}</span>
+                <span>${q.max_label}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // 4. Suggestions (Core)
+    html += `
+      <div class="card">
+        <div class="section-label">
+          <div class="section-num">${currentStep++}</div>
+          <span class="section-title">Sugerencias</span>
+        </div>
+        <p class="question-text">
+          Cuéntanos tus sugerencias:
+          <span class="question-sub">Cualquier idea es bienvenida para seguir mejorando</span>
+        </p>
+        <div class="textarea-wrap">
+          <textarea id="sugerencias" placeholder="¿Cómo podemos mejorar el servicio de ${surveyConfig.area}?" maxlength="500" oninput="updateCoreResponse('sugerencias', this.value)"></textarea>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+    document.getElementById('surveyContainer').style.display = 'block';
+    document.getElementById('stepCounter').textContent = `Módulo ${currentStep - 1} de ${currentStep - 1}`;
+    totalSteps = currentStep - 1;
+    updateProgress();
+  }
+
+  let totalSteps = 0;
 
   function selectNPS(btn) {
-    document.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
+    btn.parentElement.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
-    npsVal = parseInt(btn.dataset.val);
+    npsVal = parseInt(btn.dataset.val || btn.textContent);
+    responses.nps = npsVal;
     updateProgress();
   }
 
-  function selectScale(btn, group) {
-    btn.closest('.scale-options').querySelectorAll('.scale-opt').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    scaleVals[group] = true;
+  function selectScale(btn, qId) {
+    btn.parentElement.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    scaleVals[qId] = parseInt(btn.textContent);
+    responses.complementary[qId] = scaleVals[qId];
     updateProgress();
   }
 
-  function updateCharCount() {
-    document.getElementById('charCount').textContent = document.getElementById('comentario').value.length;
+  function updateCoreResponse(key, val) {
+    responses[key] = val;
+    if (key === 'comentario') {
+      document.getElementById('charCount').textContent = val.length;
+    }
+    updateProgress();
   }
 
   function updateProgress() {
-    const filled = (npsVal ? 1 : 0)
-      + (document.getElementById('comentario').value.length > 0 ? 1 : 0)
-      + (Object.keys(scaleVals).length / 3);
-    const pct = Math.min(100, Math.round((filled / 3) * 100));
+    let filled = 0;
+    if (responses.nps) filled++;
+    if (responses.comentario.length > 0) filled++;
+    
+    const compCount = surveyConfig.questions ? surveyConfig.questions.length : 0;
+    if (compCount > 0) {
+      const compFilled = Object.keys(scaleVals).length / compCount;
+      filled += compFilled;
+    }
+
+    if (responses.sugerencias.length > 0) filled++;
+
+    const pct = Math.min(100, Math.round((filled / totalSteps) * 100));
     document.getElementById('progressBar').style.width = pct + '%';
   }
 
-  document.getElementById('comentario').addEventListener('input', updateProgress);
-
   function submitForm() {
-    window.location.href = 'confirmacion.html';
+    localStorage.setItem('last_nps_response', JSON.stringify(responses));
+    const version = new URLSearchParams(window.location.search).get('v') || 'soporte';
+    window.location.href = `confirmacion.html?v=${version}&nps=${npsVal || ''}`;
   }
 </script>
 </body>

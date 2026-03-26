@@ -1,0 +1,24 @@
+{
+  "area": "App Coppel",
+  "description": "Queremos conocer tu opinión sobre nuestra aplicación móvil.",
+  "questions": [
+    {
+      "id": "facilidad_uso",
+      "text": "¿Qué tan fácil te resultó navegar y encontrar lo que buscabas en la App?",
+      "min_label": "Muy difícil",
+      "max_label": "Muy fácil"
+    },
+    {
+      "id": "velocidad_app",
+      "text": "¿Cómo calificarías la velocidad y fluidez de la aplicación?",
+      "min_label": "Muy lenta",
+      "max_label": "Muy fluida"
+    },
+    {
+      "id": "diseno_visual",
+      "text": "¿Qué tan atractivo te parece el diseño visual de la interfaz?",
+      "min_label": "Poco atractivo",
+      "max_label": "Muy atractivo"
+    }
+  ]
+}

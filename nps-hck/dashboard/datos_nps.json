@@ -1,0 +1,62 @@
+[
+  {
+    "fechaCaptura": "2026-03-24 09:15:00",
+    "nps_score": 2,
+    "comentario": "La aplicación de Bancoppel se cierra cada vez que intento hacer una transferencia. Es frustrante porque me urge hacer pagos y no puedo.",
+    "area": "Bancoppel"
+  },
+  {
+    "fechaCaptura": "2026-03-25 11:30:00",
+    "nps_score": 9,
+    "comentario": "El técnico que me atendió resolvió el problema de mi contraseña en menos de 5 minutos. Muy amable y directo al punto, excelente servicio.",
+    "area": "Mesa de ayuda"
+  },
+  {
+    "fechaCaptura": "2026-03-25 14:20:00",
+    "nps_score": 5,
+    "comentario": "Llevamos toda la mañana sin internet en la sucursal. Los clientes se están yendo porque no podemos cobrar. Urge que arreglen los servidores.",
+    "area": "Operaciones IT"
+  },
+  {
+    "fechaCaptura": "2026-03-20 16:45:00",
+    "nps_score": 1,
+    "comentario": "Me marcan 10 veces al día de cobranza por un atraso de dos días. ¡Ya les dije que mañana pago! Es un acoso insoportable.",
+    "area": "Cobranza Digital"
+  },
+  {
+    "fechaCaptura": "2026-03-21 10:00:00",
+    "nps_score": 8,
+    "comentario": "El curso de inducción estuvo muy bien explicado y el personal de RH fue muy claro con las prestaciones, aunque la plataforma de videos estaba un poco lenta.",
+    "area": "Recursos humanos"
+  },
+  {
+    "fechaCaptura": "2026-03-22 13:10:00",
+    "nps_score": 4,
+    "comentario": "Fui a solicitar un préstamo pero las tasas de interés que me mostraron en el contrato no coinciden con lo que vi en la publicidad de Facebook. Me sentí engañado.",
+    "area": "Bancoppel"
+  },
+  {
+    "fechaCaptura": "2026-03-23 15:50:00",
+    "nps_score": 6,
+    "comentario": "Pedí un monitor nuevo para mi estación de trabajo hace 3 semanas y sigo esperando. Nadie me da estatus de la entrega ni fecha estimada.",
+    "area": "Mesa de ayuda"
+  },
+  {
+    "fechaCaptura": "2026-03-24 08:05:00",
+    "nps_score": 10,
+    "comentario": "El nuevo sistema de facturación es una maravilla. Todo carga súper rápido y la interfaz es súper intuitiva, nos ahorró horas de trabajo.",
+    "area": "Operaciones IT"
+  },
+  {
+    "fechaCaptura": "2026-03-25 12:00:00",
+    "nps_score": 3,
+    "comentario": "Claro, qué bonito que te ofrezcan descuentos por pagar a tiempo, lástima que su sistema nunca registra mis abonos cuando los hago por la web.",
+    "area": "Cobranza Digital"
+  },
+  {
+    "fechaCaptura": "2026-03-25 17:30:00",
+    "nps_score": 7,
+    "comentario": "Tuve dudas sobre cómo registrar mis vacaciones en el portal. Me contestaron rápido, pero me mandaron un manual de 50 hojas en lugar de explicarme paso a paso.",
+    "area": "Recursos humanos"
+  }
+]

@@ -36,9 +36,10 @@
     flex-shrink: 0; height: 100vh; overflow: hidden;
   }
   .sidebar-logo {
-    padding: 20px 20px 16px;
-    display: flex; align-items: center; gap: 10px;
+    padding: 0;
+    display: flex; align-items: center; justify-content: center;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
   }
   .logo-mark {
     width: 34px; height: 34px; background: var(--amarillo); border-radius: 8px;
@@ -357,11 +358,7 @@
 <!-- Sidebar -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-mark">C</div>
-    <div class="logo-name">
-      Coppel TI
-      <small>NPS Intelligence</small>
-    </div>
+      <img src="Logo-NPS-Sentinel.svg" alt="NPS Sentinel Logo" style="width: 220px; height: 115px; display: block; object-fit: cover; margin-top: 12px;">
   </div>
   <div class="nav-section">Principal</div>
   <a href="dashboard.html" class="nav-item" style="text-decoration: none;">
@@ -647,11 +644,20 @@ function renderBotPlainText(texto) {
   });
 }
 
+async function consultarBackendRAG(textoUsuario) {
+  const response = await fetch('http://localhost:8080/nps/recomendar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ collection: 'feedback_nps_2026', focus: textoUsuario })
+  });
+  if (!response.ok) throw new Error(`Backend HTTP ${response.status}`);
+  const data = await response.json();
+  return data.recomendacion || JSON.stringify(data);
+}
+
 async function consultarGeniusDirecto(textoUsuario) {
   const apiKey = getApiKeyLocal();
-  if (!apiKey) {
-    throw new Error('No se proporciono API key.');
-  }
+  if (!apiKey) throw new Error('No se proporciono API key.');
 
   const response = await fetch(`${GENIUS_BASE_URL}/v1/chat/completions`, {
     method: 'POST',
@@ -678,25 +684,60 @@ async function consultarGeniusDirecto(textoUsuario) {
   return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
 }
 
+function renderGenerativeUIBubble(rawIA) {
+  // Intentar parsear como Generative UI JSON
+  let genUI = null;
+  try {
+    let jsonStr = rawIA.trim();
+    if (jsonStr.startsWith('```')) {
+      jsonStr = jsonStr.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '');
+    }
+    const parsed = JSON.parse(jsonStr);
+    if (parsed && parsed.ui_type && parsed.mensaje_principal) {
+      genUI = parsed;
+    }
+  } catch (_) { /* fallback */ }
+
+  if (genUI) {
+    // Render using ChatbotUI (generative-ui.js) which handles pareto_insight
+    ChatbotUI.renderizarRespuestaIA(genUI);
+
+    // Update RAG sources panel if ui_data has fuentes
+    if (genUI.ui_data && genUI.ui_data.fuentes) {
+      ChatbotUI.actualizarFuentesRAG(genUI.ui_data.fuentes);
+    }
+  } else {
+    // Fallback: render as plain markdown
+    renderBotPlainText(rawIA || 'Respuesta vacía del modelo.');
+  }
+}
+
 async function sendMessage() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if (!text) return;
 
   appendUserMessage(text);
-
   input.value = '';
   input.style.height = 'auto';
   showTyping();
 
   try {
-    const respuestaTexto = await consultarGeniusDirecto(text);
+    // Primero: intentar backend RAG (Go API con Qdrant + LLM)
+    const respuestaRAG = await consultarBackendRAG(text);
     hideTyping();
-    renderBotPlainText(respuestaTexto || 'Respuesta vacia del modelo.');
-    ChatbotUI.actualizarFuentesRAG([]);
-  } catch (error) {
-    hideTyping();
-    ChatbotUI.renderErrorBot(`No fue posible chatear con Genius API. ${error.message}`);
+    renderGenerativeUIBubble(respuestaRAG);
+  } catch (backendErr) {
+    console.warn('Backend RAG no disponible, fallback a Genius API:', backendErr.message);
+    try {
+      const respuestaTexto = await consultarGeniusDirecto(text);
+      hideTyping();
+      renderBotPlainText(respuestaTexto || 'Respuesta vacía del modelo.');
+      ChatbotUI.actualizarFuentesRAG([]);
+    } catch (geniusErr) {
+      hideTyping();
+      ChatbotUI.renderErrorBot(`No fue posible conectar con ningún servicio de IA. Backend: ${backendErr.message}. Genius: ${geniusErr.message}`);
+    }
   }
 }
 </script>

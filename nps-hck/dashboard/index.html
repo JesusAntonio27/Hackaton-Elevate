@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Inteligente - Conocimiento y NPS</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --font-color: #333;
+            --primary-color: #0056b3;
+            --secondary-color: #17a2b8;
+            --accent-color: #ffc107;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+            --ia-bg: #f8f9fa;
+            --ia-border: #e2e8f0;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--font-color);
+        }
+        header {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        header h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+        
+        /* Tabs System */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin: 0 2rem 2rem 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #6c757d;
+            cursor: pointer;
+            margin-bottom: -2px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: var(--primary-color); }
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        .tab-content { display: none; padding: 0 2rem; }
+        .tab-content.active { display: block; }
+
+        /* Grid & Cards */
+        .container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            height: fit-content;
+        }
+        .card h2 { margin-top: 0; color: var(--primary-color); font-size: 1.25rem; }
+
+        /* Forms */
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
+        input[type="text"], textarea {
+            width: 100%; padding: 0.75rem; border: 1px solid var(--border-color);
+            border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; font-family: inherit;
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        button {
+            width: 100%; padding: 0.75rem; border: none; border-radius: 6px;
+            background-color: var(--primary-color); color: white; font-size: 1rem;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        button:hover { background-color: #004494; }
+
+        /* Status & Results */
+        #status-message {
+            margin: 0 2rem 1rem 2rem; padding: 1rem; border-radius: 6px; font-weight: 500; display: none;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        
+        .results-area { display: flex; flex-direction: column; gap: 1rem; }
+        
+        /* Result Item Styles */
+        .result-item {
+            background: white; border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: var(--shadow);
+        }
+        .result-header { display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);}
+        .badge { background: #e9ecef; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold;}
+        .badge.nps { background: var(--secondary-color); color: white; }
+        
+        .content-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        .content-group strong { display: block; color: #495057; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 0.2rem;}
+        
+        /* Estilos específicos para la IA */
+        .ia-box {
+            background: var(--ia-bg); border: 1px solid var(--ia-border);
+            border-left: 4px solid var(--accent-color); padding: 1rem; border-radius: 6px; margin-top: 1rem;
+        }
+        .ia-box-title { color: #856404; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;}
+        .ia-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 600px) { .ia-grid { grid-template-columns: 1fr; } }
+
+
+        .badge.sent-positivo { background: #28a745; color: white; }
+        .badge.sent-neutral { background: #ffc107; color: black; }
+        .badge.sent-negativo { background: #fd7e14; color: white; }
+        .badge.sent-muy-negativo { background: #dc3545; color: white; }
+        
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🤖 Semantic Dashboard</h1>
+        <div id="status-message"></div>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-nps')">Feedback de Usuarios (NPS)</button>
+        <button class="tab-btn" onclick="switchTab('tab-rac')">Base de Conocimiento (RAC)</button>
+    </div>
+
+    <div id="tab-nps" class="tab-content active">
+        <div class="container">
+            <div class="card">
+                <h2>Buscador Semántico NPS</h2>
+                <p style="font-size: 0.9rem; color: #666;">Busca problemas reportados por usuarios. La IA extraerá el contexto.</p>
+                <form id="search-nps-form">
+                    <div class="form-group">
+                        <label>Colección (Por defecto: feedback_nps_2026)</label>
+                        <input type="text" id="nps_collection" value="feedback_nps_2026" required>
+                    </div>
+                    <div class="form-group">
+                        <label>¿Qué problema estás investigando?</label>
+                        <textarea id="nps_query" placeholder="Ej: Quejas sobre lentitud en el sistema de cobro" required></textarea>
+                    </div>
+                    <button type="submit">Analizar Top 5 Casos</button>
+                </form>
+            </div>
+            <div class="card">
+                <h2>Resultados del Análisis</h2>
+                <div id="results-nps" class="results-area">Aquí aparecerán los casos encontrados...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-rac" class="tab-content">
+        <div class="container">
+            <div class="card" style="margin-bottom: 1rem;">
+                <h2>Insertar Solución (RAC)</h2>
+                <form id="insert-rac-form">
+                    <div class="form-group">
+                        <label>Colección</label>
+                        <input type="text" id="rac_insert_collection" placeholder="Ej: base_conocimiento_ti" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Área</label>
+                        <input type="text" id="rac_area" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Problema</label>
+                        <textarea id="rac_problema" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Iniciativa / Solución</label>
+                        <textarea id="rac_iniciativa" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Razón</label>
+                        <textarea id="rac_razon" required></textarea>
+                    </div>
+                    <button type="submit">Guardar Solución</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Buscar Soluciones (RAC)</h2>
+                <form id="search-rac-form" style="margin-bottom: 2rem;">
+                    <div class="form-group">
+                        <label>Colección a buscar</label>
+                        <input type="text" id="rac_search_collection" placeholder="Ej: base_conocimiento_ti" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Consulta semántica</label>
+                        <textarea id="rac_query" placeholder="Ej: ¿Cómo arreglo el error de base de datos?" required></textarea>
+                    </div>
+                    <button type="submit">Buscar Solución</button>
+                </form>
+
+                <div id="results-rac" class="results-area">Resultados de conocimiento...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = "http://localhost:8080";
+
+        // --- MANEJO DE TABS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // --- MENSAJES DE ESTADO ---
+        const statusDiv = document.getElementById('status-message');
+        function showMessage(msg, type) {
+            statusDiv.textContent = msg;
+            statusDiv.className = type;
+            statusDiv.style.display = 'block';
+            setTimeout(() => statusDiv.style.display = 'none', 4000);
+        }
+
+        // --- 1. BUSCAR EN NPS (CON IA) ---
+        document.getElementById('search-nps-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultsDiv = document.getElementById('results-nps');
+            resultsDiv.innerHTML = '<p>Analizando con Inteligencia Artificial...</p>';
+
+            const payload = {
+                collection: document.getElementById('nps_collection').value,
+                query: document.getElementById('nps_query').value
+            };
+
+            try {
+                // APUNTANDO AL ENDPOINT CORRECTO PARA NPS
+                const response = await fetch(`${API_BASE_URL}/nps/buscar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+                const data = await response.json();
+                
+                if (!data || data.length === 0) {
+                    resultsDiv.innerHTML = '<p>No se encontraron casos similares.</p>';
+                    return;
+                }
+
+                resultsDiv.innerHTML = '';
+                data.forEach(item => {
+                    // Diseño especial para mostrar qué extrajo la IA
+                    resultsDiv.innerHTML += `
+                        <div class="result-item">
+                            <div class="result-header">
+                                <span class="badge">Usuario: ${item.id_colaborador || 'N/A'}</span>
+                                <span class="badge nps">NPS Score: ${item.nps_score} (${item.clasificacion_nps || 'N/A'})</span>
+                            </div>
+                            <div class="content-group">
+                                <strong>Comentario Original del Usuario</strong>
+                                <p style="font-style: italic; color: #555;">"${item.comentario}"</p>
+                            </div>
+                            
+                            ${item.generado_por_ia ? `
+                            <div class="ia-box">
+                                <div class="ia-box-title">✨ Análisis generado por IA</div>
+                                <div class="ia-grid">
+                                    <div class="content-group"><strong>Área Detectada:</strong> <p>${item.area_ia}</p></div>
+                                    <div class="content-group"><strong>Problema Raíz:</strong> <p>${item.problema_ia}</p></div>
+                                    <div class="content-group"><strong>Acción Sugerida:</strong> <p>${item.iniciativa_ia}</p></div>
+                                    <div class="content-group"><strong>Justificación:</strong> <p>${item.razon_ia}</p></div>
+                                </div>
+                            </div>
+                            ` : '<p style="font-size: 0.8rem; color: #999; margin-top: 1rem;">* Este registro no fue procesado por IA.</p>'}
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: red;">Error en la búsqueda: ${error.message}</p>`;
+            }
+        });
+
+        // --- 2. BUSCAR EN RAC (MANUAL) ---
+        document.getElementById('search-rac-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultsDiv = document.getElementById('results-rac');
+            resultsDiv.innerHTML = '<p>Buscando...</p>';
+
+            const payload = {
+                collection: document.getElementById('rac_search_collection').value,
+                query: document.getElementById('rac_query').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/conocimiento/buscar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+                const data = await response.json();
+                
+                if (!data || data.length === 0) {
+                    resultsDiv.innerHTML = '<p>No hay soluciones documentadas para este problema.</p>';
+                    return;
+                }
+
+                resultsDiv.innerHTML = '';
+                data.forEach(item => {
+                    resultsDiv.innerHTML += `
+                        <div class="result-item">
+                            <div class="content-group" style="margin-bottom: 0.8rem;"><strong>Área responsable</strong> <p style="margin:0">${item.area}</p></div>
+                            <div class="content-group" style="margin-bottom: 0.8rem;"><strong>Problema</strong> <p style="margin:0">${item.problema}</p></div>
+                            <div class="content-group" style="margin-bottom: 0.8rem;"><strong>Solución / Iniciativa</strong> <p style="margin:0; color: var(--primary-color); font-weight: 500;">${item.iniciativa}</p></div>
+                            <div class="content-group"><strong>Justificación</strong> <p style="margin:0">${item.razon}</p></div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: red;">Error en la búsqueda: ${error.message}</p>`;
+            }
+        });
+
+        // --- 3. INSERTAR EN RAC ---
+        document.getElementById('insert-rac-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                collection: document.getElementById('rac_insert_collection').value,
+                area: document.getElementById('rac_area').value,
+                problema: document.getElementById('rac_problema').value,
+                iniciativa: document.getElementById('rac_iniciativa').value,
+                razon: document.getElementById('rac_razon').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/conocimiento/insertar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+                showMessage('✅ Solución agregada a la base de conocimiento.', 'success');
+                e.target.reset();
+            } catch (error) {
+                showMessage(`❌ Error: ${error.message}`, 'error');
+            }
+        });
+
+    </script>
+</body>
+</html>

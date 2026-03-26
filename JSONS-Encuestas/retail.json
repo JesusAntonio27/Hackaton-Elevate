@@ -1,0 +1,24 @@
+{
+  "area": "Tienda / Retail",
+  "description": "Ayúdanos a mejorar tu experiencia de compra en nuestras sucursales.",
+  "questions": [
+    {
+      "id": "limpieza_tienda",
+      "text": "¿Cómo calificarías la limpieza y orden de la tienda?",
+      "min_label": "Muy mala",
+      "max_label": "Excelente"
+    },
+    {
+      "id": "tiempo_caja",
+      "text": "¿Qué tan satisfecho estás con el tiempo de espera en cajas?",
+      "min_label": "Muy lento",
+      "max_label": "Muy rápido"
+    },
+    {
+      "id": "amabilidad_personal",
+      "text": "¿Qué tan amable fue el personal que te atendió en piso de venta?",
+      "min_label": "Nada amable",
+      "max_label": "Muy amable"
+    }
+  ]
+}

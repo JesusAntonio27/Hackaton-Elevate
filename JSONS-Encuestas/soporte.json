@@ -1,0 +1,24 @@
+{
+  "area": "Soporte Técnico",
+  "description": "Evaluación del servicio de soporte recibido por el equipo de TI.",
+  "questions": [
+    {
+      "id": "tiempo_resolucion",
+      "text": "¿Qué tan satisfecho estás con el tiempo de resolución de tu ticket?",
+      "min_label": "Muy lento",
+      "max_label": "Muy rápido"
+    },
+    {
+      "id": "claridad_agente",
+      "text": "¿Qué tan clara fue la comunicación del agente que te atendió?",
+      "min_label": "Nada clara",
+      "max_label": "Muy clara"
+    },
+    {
+      "id": "solucion_efectiva",
+      "text": "¿En qué medida el agente logró resolver tu problema técnico?",
+      "min_label": "Sin resolver",
+      "max_label": "Resuelto al 100%"
+    }
+  ]
+}

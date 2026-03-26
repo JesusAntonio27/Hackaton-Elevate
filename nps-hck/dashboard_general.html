@@ -1,0 +1,3121 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard NPS General · Coppel TI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      /* COLORS - Interactive */
+      --color-interactive-primary: #1C42E8;
+      --color-interactive-primary-hover: #081754;
+      --color-interactive-error: #FF594D;
+      --color-interactive-error-press: #C8180D;
+
+      /* COLORS - Text */
+      --color-text: #081754;
+      --color-text-warning: #CF4600;
+      --color-text-success: #2E8A41;
+
+      /* COLORS - Background */
+      --color-bg-0: #F3F3F3;
+      --color-bg-body: #FFFFFF;
+
+      /* COLORS - Icon */
+      --color-icon-soft: #4A4A4A;
+
+      /* COLORS - Border */
+      --color-border: #C9C9C9;
+
+      /* COLORS - Brand */
+      --color-brand-coppel: #F0D224;
+      --color-brand-bancoppel: #05297A;
+
+      /* Shadow */
+      --shadow-default: 0px 6px 24px 0px rgba(25, 75, 123, 0.04);
+      --shadow-hover: 0px 6px 24px 0px rgba(25, 75, 123, 0.12);
+      --shadow-primary: 0px 6px 24px 0px rgba(25, 75, 123, 0.18);
+
+      /* Aliases (compatibilidad con estilos existentes) */
+      --azul: var(--color-interactive-primary);
+      --azul-medio: var(--color-interactive-primary);
+      --azul-claro: #EAF0FF;
+      --amarillo: var(--color-brand-coppel);
+      --gris-bg: var(--color-bg-0);
+      --gris-borde: var(--color-border);
+      --texto: var(--color-text);
+      --subtexto: var(--color-icon-soft);
+      --verde: var(--color-text-success);
+      --verde-bg: #EAF8EE;
+      --rojo: var(--color-interactive-error-press);
+      --rojo-bg: #FDECEA;
+      --naranja: var(--color-text-warning);
+      --naranja-bg: #FFF3E0;
+      --morado: #6A1B9A;
+      --morado-bg: #F3E5F5;
+      --sidebar-w: 220px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Figtree', sans-serif;
+      background: var(--color-bg-0);
+      color: var(--color-text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: linear-gradient(180deg, var(--color-brand-bancoppel) 0%, #0A1E6A 100%);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      background: var(--amarillo);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--azul);
+      flex-shrink: 0;
+    }
+
+    .logo-name {
+      color: white;
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.1;
+    }
+
+    .logo-name small {
+      display: block;
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .nav-section {
+      padding: 14px 12px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      margin: 1px 8px;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+    }
+
+    .nav-item.active {
+      background: var(--azul-medio);
+      color: white;
+      font-weight: 600;
+    }
+
+    .nav-item svg {
+      flex-shrink: 0;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--rojo);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 14px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--azul-medio);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .user-info .name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: white;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-info .role {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* ── Main ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      background: var(--color-bg-body);
+      border-bottom: 1px solid var(--gris-borde);
+      padding: 0 1.75rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-default);
+    }
+
+    .topbar-left h1 {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--texto);
+    }
+
+    .topbar-left p {
+      font-size: 12px;
+      color: var(--subtexto);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1.5px solid var(--color-border);
+      background: var(--color-bg-body);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-family: 'Figtree', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--texto);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--color-interactive-primary);
+      background: #EEF3FF;
+    }
+
+    .btn-export {
+      background: var(--color-interactive-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: 'Figtree', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.2s;
+    }
+
+    .btn-export:hover {
+      background: var(--color-interactive-primary-hover);
+      box-shadow: var(--shadow-primary);
+    }
+
+    /* ── Content ── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 1.75rem 2rem;
+    }
+
+    .area-highlight {
+      background: linear-gradient(135deg, #ffffff 0%, #eef3ff 100%);
+      border: 1px solid var(--gris-borde);
+      border-left: 6px solid var(--color-interactive-primary);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-default);
+    }
+
+    .area-highlight .label {
+      font-size: 11px;
+      color: var(--subtexto);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      font-weight: 700;
+    }
+
+    .area-highlight .value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--color-text);
+      margin-top: 2px;
+    }
+
+    .area-highlight .sub {
+      font-size: 12px;
+      color: var(--subtexto);
+      margin-top: 2px;
+    }
+
+    /* KPI hierarchy */
+    .kpi-main-row {
+      margin-bottom: .9rem;
+    }
+
+    .kpi-secondary-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .kpi-card {
+      background: var(--color-bg-body);
+      border-radius: 14px;
+      padding: 1.25rem 1.25rem 1rem;
+      border: 1px solid var(--gris-borde);
+      box-shadow: var(--shadow-default);
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 0.4s ease both;
+    }
+
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .kpi-card.nps::after {
+      background: var(--azul);
+    }
+
+    .kpi-card.promo::after {
+      background: var(--verde);
+    }
+
+    .kpi-card.detract::after {
+      background: var(--rojo);
+    }
+
+    .kpi-card.resenas::after {
+      background: var(--amarillo);
+    }
+
+    .kpi-card.main {
+      padding: 1.45rem 1.35rem 1.25rem;
+    }
+
+    .kpi-card.main .kpi-value {
+      font-size: 56px;
+    }
+
+    .kpi-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--subtexto);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--texto);
+      line-height: 1;
+    }
+
+    .kpi-value.green {
+      color: var(--verde);
+    }
+
+    .kpi-value.red {
+      color: var(--rojo);
+    }
+
+    .kpi-value.blue {
+      color: var(--azul);
+    }
+
+    .kpi-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      width: fit-content;
+      max-width: max-content;
+      white-space: nowrap;
+    }
+
+    .kpi-delta.up {
+      background: var(--verde-bg);
+      color: var(--verde);
+    }
+
+    .kpi-delta.down {
+      background: var(--rojo-bg);
+      color: var(--rojo);
+    }
+
+    .kpi-delta.warn {
+      background: var(--naranja-bg);
+      color: var(--naranja);
+    }
+
+    .kpi-icon {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      opacity: 0.07;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .kpi-card:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .kpi-card:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .kpi-card:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+
+    .kpi-card:nth-child(4) {
+      animation-delay: 0.2s;
+    }
+
+    /* Charts row */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .chart-card {
+      background: var(--color-bg-body);
+      border-radius: 14px;
+      padding: 1.25rem;
+      border: 1px solid var(--gris-borde);
+      box-shadow: var(--shadow-default);
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .chart-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--texto);
+    }
+
+    .chart-subtitle {
+      font-size: 12px;
+      color: var(--subtexto);
+      margin-top: 1px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 12px;
+    }
+
+    .legend-dot {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      color: var(--subtexto);
+      font-weight: 500;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .canvas-wrap {
+      position: relative;
+    }
+
+    .thermo-wrap {
+      height: 185px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .thermo-track {
+      height: 24px;
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+      border: 1px solid var(--gris-borde);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    .thermo-seg {
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .thermo-seg:hover {
+      transform: scaleY(1.1);
+      filter: brightness(1.03);
+      z-index: 2;
+    }
+
+    .thermo-seg.prom {
+      background: #1B8A5A;
+    }
+
+    .thermo-seg.neu {
+      background: #F9A825;
+    }
+
+    .thermo-seg.det {
+      background: #D32F2F;
+    }
+
+    .thermo-seg::after {
+      content: attr(data-label);
+      position: absolute;
+      left: 50%;
+      top: -28px;
+      transform: translateX(-50%);
+      background: #1A2340;
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 4px 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
+      white-space: nowrap;
+    }
+
+    .thermo-seg:hover::after {
+      opacity: 1;
+    }
+
+    .thermo-legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 11.5px;
+      color: var(--subtexto);
+      font-weight: 600;
+    }
+
+    .thermo-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gris-bg);
+      border: 1px solid var(--gris-borde);
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+
+    .thermo-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .kpi-thermo {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--gris-borde);
+    }
+
+    .kpi-thermo .thermo-wrap {
+      height: auto;
+      gap: 10px;
+    }
+
+    .kpi-thermo .thermo-track {
+      height: 18px;
+    }
+
+    /* Bottom row */
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* Pareto table */
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .issues-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .issue-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--gris-borde);
+      background: var(--gris-bg);
+      transition: background 0.15s;
+    }
+
+    .issue-item:hover {
+      background: #eef3ff;
+      box-shadow: var(--shadow-hover);
+    }
+
+    .issue-item.active-focus {
+      background: #eef3ff;
+      border-color: var(--azul-medio);
+      box-shadow: 0 0 0 2px rgba(28, 66, 232, 0.18);
+    }
+
+    .issue-rank {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--azul);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .issue-rank.top {
+      background: var(--rojo);
+    }
+
+    .issue-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .issue-name {
+      font-size: 9px;
+      font-weight: 600;
+      /* Color azul con 0.5 de opacidad (el último número) */
+      color: rgba(0, 0, 255, 0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .issue-subname {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--texto);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .issue-area {
+      font-size: 11px;
+      color: var(--subtexto);
+    }
+
+    .issue-bar-wrap {
+      width: 90px;
+    }
+
+    .issue-bar-bg {
+      background: var(--gris-borde);
+      border-radius: 4px;
+      height: 6px;
+    }
+
+    .issue-bar {
+      height: 6px;
+      border-radius: 4px;
+      background: var(--azul);
+      transition: width 0.6s ease;
+    }
+
+    .issue-bar.red {
+      background: var(--rojo);
+    }
+
+    .issue-pct {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--subtexto);
+      text-align: right;
+      margin-top: 3px;
+    }
+
+    .issue-count {
+      background: var(--azul-claro);
+      color: var(--azul-medio);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .issue-actions {
+      margin-left: auto;
+    }
+
+    .btn-details {
+      border: 1.5px solid var(--gris-borde);
+      background: white;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--azul-medio);
+      cursor: pointer;
+    }
+
+    .btn-details:hover {
+      border-color: var(--azul-medio);
+      background: var(--azul-claro);
+    }
+
+    .btn-details.active {
+      background: var(--azul-medio);
+      color: #fff;
+      border-color: var(--azul-medio);
+      box-shadow: var(--shadow-default);
+    }
+
+    /* Historial reseñas */
+    .review-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .review-list.scrollable {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .review-item {
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--gris-borde);
+      background: #f8f8f8;
+    }
+
+    .review-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .review-area {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--subtexto);
+    }
+
+    .review-time {
+      font-size: 11px;
+      color: #9BA5BE;
+    }
+
+    .review-text {
+      font-size: 13px;
+      color: var(--texto);
+      line-height: 1.45;
+      margin-bottom: 7px;
+    }
+
+    .review-tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .tag.promo {
+      background: var(--verde-bg);
+      color: var(--verde);
+    }
+
+    .tag.detract {
+      background: var(--rojo-bg);
+      color: var(--rojo);
+    }
+
+    .tag.neutral {
+      background: var(--naranja-bg);
+      color: var(--naranja);
+    }
+
+    .tag.domain {
+      background: var(--azul-claro);
+      color: var(--azul-medio);
+    }
+
+    .score-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .score-pill.p {
+      background: var(--verde-bg);
+      color: var(--verde);
+    }
+
+    .score-pill.d {
+      background: var(--rojo-bg);
+      color: var(--rojo);
+    }
+
+    .score-pill.n {
+      background: var(--naranja-bg);
+      color: var(--naranja);
+    }
+
+    /* Drawer detalle IA */
+    .detail-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 20, 45, 0.32);
+      z-index: 60;
+      display: none;
+    }
+
+    .detail-overlay.show {
+      display: block;
+    }
+
+    .detail-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 420px;
+      max-width: 95vw;
+      height: 100vh;
+      background: white;
+      border-left: 1px solid var(--gris-borde);
+      box-shadow: -8px 0 20px rgba(0, 0, 0, 0.12);
+      z-index: 61;
+      transform: translateX(100%);
+      transition: transform .25s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-drawer.show {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--gris-borde);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .drawer-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--texto);
+    }
+
+    .drawer-subtitle {
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--subtexto);
+    }
+
+    .focus-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .focus-chip.critico {
+      background: #fdecea;
+      color: #c8180d;
+      border-color: #ffb9b3;
+    }
+
+    .focus-chip.medio {
+      background: #fff3e0;
+      color: #cf4600;
+      border-color: #ffd59a;
+    }
+
+    .focus-chip.controlado {
+      background: #eaf8ee;
+      color: #2e8a41;
+      border-color: #b7e7c2;
+    }
+
+    .drawer-close {
+      border: 0;
+      background: transparent;
+      color: var(--subtexto);
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .drawer-body {
+      padding: 14px 16px;
+      overflow-y: auto;
+    }
+
+    .ai-box {
+      border: 1px solid var(--gris-borde);
+      background: #f7faff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .ai-box.focus {
+      border-left: 4px solid var(--azul-medio);
+      background: linear-gradient(135deg, #f7faff 0%, #eef4ff 100%);
+    }
+
+    .ai-box.warn {
+      border-left: 4px solid #cf4600;
+      background: linear-gradient(135deg, #fff9f0 0%, #fff3e0 100%);
+    }
+
+    .ai-box.alert {
+      border-left: 4px solid #c8180d;
+      background: linear-gradient(135deg, #fff4f4 0%, #fdecea 100%);
+    }
+
+    .ai-box .k {
+      font-size: 10.5px;
+      color: var(--subtexto);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: .5px;
+      margin-bottom: 5px;
+    }
+
+    .ai-box .v {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--texto);
+    }
+
+    /* ── Area Grid (General View) ── */
+    .section-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--subtexto);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin: 1.5rem 0 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gris-borde);
+    }
+
+    .area-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .area-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid var(--gris-borde);
+      box-shadow: var(--shadow-default);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .area-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--azul-medio);
+    }
+
+    .area-card.alert {
+      border-color: var(--rojo);
+      background: #fffafa;
+    }
+
+    .area-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .area-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .area-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--texto);
+      margin-bottom: 4px;
+    }
+
+    .area-nps {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .area-nps.good {
+      color: var(--verde);
+    }
+
+    .area-nps.mid {
+      color: var(--azul);
+    }
+
+    .area-nps.warn {
+      color: var(--naranja);
+    }
+
+    .area-nps.bad {
+      color: var(--rojo);
+    }
+
+    .area-stats {
+      display: flex;
+      gap: 6px;
+    }
+
+    .area-stat {
+      flex: 1;
+      text-align: center;
+      padding: 4px 2px;
+      border-radius: 6px;
+      background: var(--gris-bg);
+    }
+
+    .area-stat .stat-val {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--texto);
+    }
+
+    .area-stat .stat-lbl {
+      font-size: 9px;
+      color: var(--subtexto);
+      font-weight: 600;
+    }
+
+    .area-trend {
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .area-trend.up {
+      color: var(--verde);
+    }
+
+    .area-trend.down {
+      color: var(--rojo);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .view-selector {
+      background: var(--azul-claro);
+      color: var(--azul-medio);
+      border: 1px solid var(--azul-medio);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+    }
+
+    /* ── Custom Dropdown ── */
+    .custom-dropdown {
+      position: relative;
+      display: inline-block;
+      user-select: none;
+    }
+
+    .dropdown-trigger {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--texto);
+      cursor: pointer;
+      transition: color 0.2s;
+      margin-top: -4px;
+    }
+
+    .dropdown-trigger:hover {
+      color: var(--azul-medio);
+    }
+
+    .dropdown-trigger svg {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.2s;
+      stroke-width: 3px;
+    }
+
+    .custom-dropdown.open .dropdown-trigger svg {
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--gris-borde);
+      min-width: 220px;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .custom-dropdown.open .dropdown-menu {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .dropdown-option {
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--texto);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.15s;
+    }
+
+    .dropdown-option:hover {
+      background: var(--gris-bg);
+      color: var(--azul-medio);
+    }
+
+    .dropdown-option.active {
+      color: var(--azul-medio);
+      background: var(--azul-claro);
+    }
+
+    .dropdown-option svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .dropdown-option.active svg {
+      opacity: 1;
+    }
+  </style>
+  <style>
+    :root {
+      --azul: #003087;
+      --azul-medio: #0047BA;
+      --azul-claro: #E8F0FD;
+      --azul-dark: #001D5E;
+      --amarillo: #FFB800;
+      --amarillo-bg: #FFF8E1;
+      --gris-bg: #EEF1F8;
+      --gris-borde: #DDE3EF;
+      --texto: #1A2340;
+      --subtexto: #5A6480;
+      --blanco: #FFFFFF;
+      --verde: #1B8A5A;
+      --verde-bg: #E8F5EF;
+      --rojo: #D32F2F;
+      --rojo-bg: #FDECEA;
+      --naranja: #E65100;
+      --naranja-bg: #FFF3E0;
+      --morado: #6A1B9A;
+      --morado-bg: #F3E5F5;
+      --sidebar-w: 220px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Figtree', sans-serif;
+      background: var(--gris-bg);
+      color: var(--texto);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--azul-dark);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      background: var(--amarillo);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--azul);
+      flex-shrink: 0;
+    }
+
+    .logo-name {
+      color: white;
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.1;
+    }
+
+    .logo-name small {
+      display: block;
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .nav-section {
+      padding: 14px 12px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      margin: 1px 8px;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+    }
+
+    .nav-item.active {
+      background: var(--azul-medio);
+      color: white;
+      font-weight: 600;
+    }
+
+    .nav-item svg {
+      flex-shrink: 0;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--rojo);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
+    .nav-badge.yellow {
+      background: var(--amarillo);
+      color: var(--azul);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 14px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--azul-medio);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .user-info .name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: white;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-info .role {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* ── Main ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      background: var(--blanco);
+      border-bottom: 1px solid var(--gris-borde);
+      padding: 0 1.75rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar-left h1 {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--texto);
+    }
+
+    .topbar-left p {
+      font-size: 12px;
+      color: var(--subtexto);
+    }
+
+    .global-badge {
+      background: linear-gradient(135deg, var(--azul), var(--azul-medio));
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1.5px solid var(--gris-borde);
+      background: white;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-family: 'Figtree', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--texto);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--azul-medio);
+    }
+
+    .btn-export {
+      background: var(--azul);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: 'Figtree', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.2s;
+    }
+
+    .btn-export:hover {
+      background: var(--azul-medio);
+    }
+
+    /* ── Content ── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem 1.75rem 2rem;
+    }
+
+    /* KPI row — 5 cols */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.875rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .kpi-card {
+      background: white;
+      border-radius: 14px;
+      padding: 1.1rem 1.1rem 0.9rem;
+      border: 1px solid var(--gris-borde);
+      box-shadow: 0 2px 6px rgba(0, 48, 135, 0.05);
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 0.4s ease both;
+    }
+
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .kpi-card.nps::after {
+      background: var(--azul);
+    }
+
+    .kpi-card.promo::after {
+      background: var(--verde);
+    }
+
+    .kpi-card.detract::after {
+      background: var(--rojo);
+    }
+
+    .kpi-card.resenas::after {
+      background: var(--amarillo);
+    }
+
+    .kpi-card.areas::after {
+      background: var(--morado);
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--subtexto);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--texto);
+      line-height: 1;
+    }
+
+    .kpi-value.green {
+      color: var(--verde);
+    }
+
+    .kpi-value.red {
+      color: var(--rojo);
+    }
+
+    .kpi-value.blue {
+      color: var(--azul);
+    }
+
+    .kpi-value.purple {
+      color: var(--morado);
+    }
+
+    .kpi-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      margin-top: 7px;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+
+    .kpi-delta.up {
+      background: var(--verde-bg);
+      color: var(--verde);
+    }
+
+    .kpi-delta.down {
+      background: var(--rojo-bg);
+      color: var(--rojo);
+    }
+
+    .kpi-delta.warn {
+      background: var(--naranja-bg);
+      color: var(--naranja);
+    }
+
+    .kpi-delta.info {
+      background: var(--morado-bg);
+      color: var(--morado);
+    }
+
+    .kpi-icon {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      opacity: 0.07;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .kpi-card:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .kpi-card:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .kpi-card:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+
+    .kpi-card:nth-child(4) {
+      animation-delay: 0.2s;
+    }
+
+    .kpi-card:nth-child(5) {
+      animation-delay: 0.25s;
+    }
+
+    /* Charts row */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 0.8fr;
+      gap: 0.875rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 14px;
+      padding: 1.1rem;
+      border: 1px solid var(--gris-borde);
+      box-shadow: 0 2px 6px rgba(0, 48, 135, 0.05);
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 0.875rem;
+    }
+
+    .chart-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--texto);
+    }
+
+    .chart-subtitle {
+      font-size: 11.5px;
+      color: var(--subtexto);
+      margin-top: 1px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .legend-dot {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--subtexto);
+      font-weight: 500;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Area cards grid */
+    .section-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--subtexto);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gris-borde);
+    }
+
+    .area-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .area-card {
+      background: white;
+      border-radius: 12px;
+      padding: 0.875rem;
+      border: 1px solid var(--gris-borde);
+      box-shadow: 0 2px 6px rgba(0, 48, 135, 0.04);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+      animation: fadeIn 0.4s ease both;
+    }
+
+    .area-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 48, 135, 0.1);
+      border-color: var(--azul-medio);
+    }
+
+    .area-card.alert {
+      border-color: #ffb3b3;
+      background: #fffafa;
+    }
+
+    .area-card.alert:hover {
+      border-color: var(--rojo);
+    }
+
+    .area-card:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .area-card:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .area-card:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+
+    .area-card:nth-child(4) {
+      animation-delay: 0.25s;
+    }
+
+    .area-card:nth-child(5) {
+      animation-delay: 0.3s;
+    }
+
+    .area-card:nth-child(6) {
+      animation-delay: 0.35s;
+    }
+
+    .area-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .area-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .area-alert-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--rojo);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(1.3);
+      }
+    }
+
+    .area-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--texto);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .area-nps {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .area-nps.good {
+      color: var(--verde);
+    }
+
+    .area-nps.mid {
+      color: var(--azul);
+    }
+
+    .area-nps.warn {
+      color: var(--naranja);
+    }
+
+    .area-nps.bad {
+      color: var(--rojo);
+    }
+
+    .area-stats {
+      display: flex;
+      gap: 6px;
+    }
+
+    .area-stat {
+      flex: 1;
+      text-align: center;
+      padding: 4px 2px;
+      border-radius: 6px;
+      background: var(--gris-bg);
+    }
+
+    .area-stat .stat-val {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--texto);
+    }
+
+    .area-stat .stat-lbl {
+      font-size: 9.5px;
+      color: var(--subtexto);
+      font-weight: 600;
+      margin-top: 1px;
+    }
+
+    .area-trend {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .area-trend.up {
+      color: var(--verde);
+    }
+
+    .area-trend.down {
+      color: var(--rojo);
+    }
+
+    .area-trend.flat {
+      color: var(--subtexto);
+    }
+
+    /* Bottom row */
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.875rem;
+    }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.875rem;
+    }
+
+    .issues-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .issue-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: 1px solid var(--gris-borde);
+      background: var(--gris-bg);
+      transition: background 0.15s;
+    }
+
+    .issue-item:hover {
+      background: var(--azul-claro);
+    }
+
+    .issue-rank {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--azul);
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .issue-rank.top {
+      background: var(--rojo);
+    }
+
+    .issue-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .issue-name {
+      font-size: 9px;
+      font-weight: 600;
+      /* Color azul con 0.5 de opacidad (el último número) */
+      color: rgba(0, 0, 255, 0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .issue-subname {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--texto);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .issue-area {
+      font-size: 10.5px;
+      color: var(--subtexto);
+    }
+
+    .issue-bar-wrap {
+      width: 80px;
+    }
+
+    .issue-bar-bg {
+      background: var(--gris-borde);
+      border-radius: 4px;
+      height: 5px;
+    }
+
+    .issue-bar {
+      height: 5px;
+      border-radius: 4px;
+      background: var(--azul);
+      transition: width 0.6s ease;
+    }
+
+    .issue-bar.red {
+      background: var(--rojo);
+    }
+
+    .issue-pct {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--subtexto);
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    .issue-count {
+      background: var(--azul-claro);
+      color: var(--azul-medio);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+
+    .issue-area-tags {
+      display: flex;
+      gap: 3px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    .atag {
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 20px;
+      background: var(--azul-claro);
+      color: var(--azul-medio);
+    }
+
+    .review-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .review-item {
+      padding: 10px 11px;
+      border-radius: 10px;
+      border: 1px solid var(--gris-borde);
+      background: var(--gris-bg);
+    }
+
+    .review-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .review-area {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--subtexto);
+    }
+
+    .review-time {
+      font-size: 10.5px;
+      color: #9BA5BE;
+    }
+
+    .review-text {
+      font-size: 12.5px;
+      color: var(--texto);
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+
+    .review-tags {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
+    .tag.promo {
+      background: var(--verde-bg);
+      color: var(--verde);
+    }
+
+    .tag.detract {
+      background: var(--rojo-bg);
+      color: var(--rojo);
+    }
+
+    .tag.neutral {
+      background: var(--naranja-bg);
+      color: var(--naranja);
+    }
+
+    .tag.domain {
+      background: var(--azul-claro);
+      color: var(--azul-medio);
+    }
+
+    .score-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .score-pill.p {
+      background: var(--verde-bg);
+      color: var(--verde);
+    }
+
+    .score-pill.d {
+      background: var(--rojo-bg);
+      color: var(--rojo);
+    }
+
+    .score-pill.n {
+      background: var(--naranja-bg);
+      color: var(--naranja);
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">C</div>
+      <div class="logo-name">
+        Coppel TI
+        <small>NPS Intelligence</small>
+      </div>
+    </div>
+
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      </svg>
+      Vista General
+      <span class="nav-badge yellow">6</span>
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
+        <rect x="14" y="14" width="7" height="7" />
+      </svg>
+      Por Área
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+      </svg>
+      Reseñas
+      <span class="nav-badge">29</span>
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+      Análisis IA
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3" />
+        <path
+          d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+      </svg>
+      Chatbot RAG
+    </div>
+
+    <div class="nav-section">Configuración</div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14" />
+      </svg>
+      Configuración
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-avatar">DG</div>
+      <div class="user-info">
+        <div class="name">D. González</div>
+        <div class="role">Director TI</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Dashboard NPS — Vista General</h1>
+        <!-- <span class="global-badge">Todas las áreas</span> -->
+        <p>Última actualización: hace 2 minutos · Marzo 2026</p>
+      </div>
+      <div class="topbar-right">
+        <button class="filter-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+          </svg>
+          Todas las áreas
+        </button>
+        <button class="filter-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          Mar 2026
+        </button>
+        <button class="btn-export">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Exportar
+        </button>
+      </div>
+    </div>
+
+
+
+    <div class="content">
+
+
+      <div class="area-highlight" id="areaHeader">
+        <div class="label" id="areaLabel">Área analizada</div>
+        <div class="custom-dropdown" id="areaDropdown">
+          <div class="dropdown-trigger" id="dropdownTrigger">
+            <span id="selectedAreaText">Soporte Técnico</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+          <div class="dropdown-menu">
+            <div class="dropdown-option active" data-value="soporte">
+              Soporte Técnico
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="dropdown-option" data-value="general">
+              Vista General
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="sub" id="areaSub">Contexto actual del dashboard para segmentación y decisiones</div>
+      </div>
+
+
+      <!-- KPIs globales -->
+      <div class="kpi-row">
+        <div class="kpi-card nps">
+          <svg class="kpi-icon" width="70" height="70" viewBox="0 0 24 24" fill="#003087">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+          <div class="kpi-label">NPS Global</div>
+          <div class="kpi-value blue">+28</div>
+          <div class="kpi-delta up">↑ +5 pts vs mes anterior</div>
+        </div>
+        <div class="kpi-card promo">
+          <svg class="kpi-icon" width="70" height="70" viewBox="0 0 24 24" fill="#1B8A5A">
+            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z" />
+          </svg>
+          <div class="kpi-label">Promotores</div>
+          <div class="kpi-value green">55%</div>
+          <div class="kpi-delta up">↑ +3% vs mes anterior</div>
+        </div>
+        <div class="kpi-card detract">
+          <svg class="kpi-icon" width="70" height="70" viewBox="0 0 24 24" fill="#D32F2F">
+            <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3z" />
+          </svg>
+          <div class="kpi-label">Detractores</div>
+          <div class="kpi-value red">27%</div>
+          <div class="kpi-delta down">↓ –2% vs mes anterior</div>
+        </div>
+        <div class="kpi-card resenas">
+          <svg class="kpi-icon" width="70" height="70" viewBox="0 0 24 24" fill="#FFB800">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <div class="kpi-label">Reseñas totales</div>
+          <div class="kpi-value">1,270</div>
+          <div class="kpi-delta warn">↑ +184 este mes</div>
+        </div>
+        <div class="kpi-card areas">
+          <svg class="kpi-icon" width="70" height="70" viewBox="0 0 24 24" fill="#6A1B9A">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          <div class="kpi-label">Áreas activas</div>
+          <div class="kpi-value purple">6</div>
+          <div class="kpi-delta info">1 foco rojo activo</div>
+        </div>
+      </div>
+
+      <!-- Charts row: Tendencia · Comparativa por área · Distribución -->
+      <div class="charts-row">
+        <!-- Tendencia global -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Tendencia NPS Global — Últimos 6 meses</div>
+              <div class="chart-subtitle">Consolidado de todas las áreas</div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-dot"><span class="dot" style="background:#003087"></span>NPS</div>
+              <div class="legend-dot"><span class="dot" style="background:#1B8A5A"></span>Promotores</div>
+              <div class="legend-dot"><span class="dot" style="background:#D32F2F"></span>Detractores</div>
+            </div>
+          </div>
+          <div style="position:relative;height:170px;">
+            <canvas id="npsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Comparativa por área (barras horizontales) -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">NPS por área</div>
+              <div class="chart-subtitle">Comparativa — Mar 2026</div>
+            </div>
+          </div>
+          <div style="position:relative;height:170px;">
+            <canvas id="areaBarChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Distribución global -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Distribución global</div>
+              <div class="chart-subtitle">Todas las áreas</div>
+            </div>
+          </div>
+          <div style="position:relative;height:170px;display:flex;align-items:center;justify-content:center;">
+            <canvas id="donutChart" style="max-height:170px;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Area cards -->
+      <div class="section-label">Estado por área</div>
+      <div class="area-grid" id="grid-centros">
+      </div>
+
+      <!-- Bottom row -->
+      <div class="bottom-row">
+
+        <!-- Pareto cruzado -->
+        <div class="chart-card">
+          <div class="table-header">
+            <div>
+              <div class="chart-title">Focos rojos globales — Análisis de Pareto</div>
+              <div class="chart-subtitle">Top causas por impacto en NPS · Todas las áreas</div>
+            </div>
+            <span
+              style="font-size:11px;font-weight:700;color:var(--rojo);background:var(--rojo-bg);padding:3px 10px;border-radius:20px;">
+              20% causas → 80% impacto
+            </span>
+          </div>
+
+          <!-- Este es el contenedor que llenaremos con JavaScript -->
+          <div class="issues-list" id="pareto-cruzado-container">
+            <div class="loading-text" style="padding: 20px;">Cargando análisis...</div>
+          </div>
+        </div>
+
+        <!-- Reseñas recientes (cross-area) -->
+        <div class="chart-card">
+          <div class="table-header">
+            <div>
+              <div class="chart-title">Reseñas recientes</div>
+              <div class="chart-subtitle">Procesadas por Gemini AI · Todas las áreas</div>
+            </div>
+            <span style="font-size:11.5px;color:var(--azul-medio);font-weight:600;cursor:pointer;">Ver todas →</span>
+          </div>
+
+          <!-- REEMPLAZA EL CONTENIDO ESTÁTICO POR ESTO: -->
+          <div class="review-list" id="recent-reviews-container">
+            <div class="loading-text" style="padding: 20px;">Cargando reseñas...</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <div class="detail-overlay" id="detailOverlay"></div>
+  <aside class="detail-drawer" id="detailDrawer">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title">Detalle IA · Foco rojo</div>
+        <div class="drawer-subtitle" id="drawerSubtitle">Selecciona un foco para inspección detallada</div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Cerrar panel">×</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+
+
+
+  <script>
+    // ==========================================
+    // CONFIGURACIÓN Y ESTADO GLOBAL
+    // ==========================================
+    const API_BASE_URL = 'http://localhost:8080';
+
+    // Objeto único para almacenar todos los datos maestros cargados desde el backend.
+    let allAPIData = {
+      stats: null,
+      history: null,
+      pareto: null,
+      reviews: null,
+      categorias: null,
+      centros: null,
+    };
+
+    // Almacena el modo actual del dashboard ('general' o el nombre de un área).
+    let currentMode = 'general';
+
+    // Contenedor para las instancias de las gráficas de Chart.js.
+    let charts = {};
+
+    // ==========================================
+    // SERVICIOS (Llamadas a la API)
+    // ==========================================
+
+    // Función genérica y reutilizable para hacer peticiones a la API.
+    async function fetchFromAPI(endpoint) {
+      try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status} en ${endpoint}`);
+        return await response.json();
+      } catch (error) {
+        console.error(`Error al cargar desde ${endpoint}:`, error);
+        return null; // Devolver null en caso de error para manejarlo después.
+      }
+    }
+
+
+    async function fetchPrediccionEstrategica(centroId, categoriaId) {
+      // Verificamos si tenemos los IDs necesarios antes de hacer la llamada.
+      if (!centroId || !categoriaId) {
+        const errorMsg = "No se pudieron encontrar los identificadores necesarios (Centro/Categoría) para generar el análisis.";
+        console.error(errorMsg, { centroId, categoriaId });
+        return { analisis_predictivo: errorMsg };
+      }
+      try {
+        const response = await fetch(`${API_BASE_URL}/nps/prediccion-estrategica`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ centro_id: centroId, categoria_id: categoriaId })
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
+      } catch (error) {
+        console.error('Error al obtener predicción estratégica:', error);
+        return null;
+      }
+    }
+
+
+    // ==========================================
+    // INICIALIZACIÓN DEL DASHBOARD (PUNTO DE ENTRADA)
+    // ==========================================
+    async function fetchNPSStats() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/nps/stats`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return await response.json();
+      } catch (error) {
+        console.error('Error al obtener estadísticas NPS:', error);
+        return null;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      // 1. Prepara los <canvas> para las gráficas con datos de ejemplo.
+      initCharts();
+      console.log("Cargando datos maestros desde el backend...");
+
+      // 2. Cargamos todos los datos necesarios desde nuestras APIs en paralelo.
+      const [stats, history, pareto, reviews, statsData, categorias, centros] = await Promise.all([
+        fetchFromAPI('/nps/stats'),
+        fetchFromAPI('/nps/stats/historico'),
+        fetchFromAPI('/nps/analisis/pareto'),
+        fetchFromAPI('/nps/resenas'),
+        fetchNPSStats(),
+        fetchFromAPI('/categorias'),
+        fetchFromAPI('/centros'),
+      ]);
+
+      if (statsData && statsData.global && statsData.areas) {
+        console.log("Datos globales y de áreas cargados:", statsData);
+
+        renderCentrosCards(statsData.areas);
+
+      } else {
+        console.error("Fallo al cargar datos globales y de áreas.");
+        // (Manejo de error)
+      }
+
+
+      // 3. Guardamos los datos en nuestro objeto de estado global para fácil acceso.
+      allAPIData = { stats, history, pareto, reviews, categorias, centros };
+      console.log("Datos maestros cargados:", allAPIData);
+
+      // 4. Con los datos ya cargados, preparamos la interfaz de usuario.
+      poblarDropdownAreas(allAPIData.stats?.areas || []);
+      setupEventListeners();
+
+      // 5. Renderizamos el dashboard por primera vez, mostrando la "Vista General".
+      actualizarDashboard('general');
+    });
+
+    // ==========================================
+    // LÓGICA PRINCIPAL DE ACTUALIZACIÓN DEL DASHBOARD
+    // ==========================================
+
+    /**
+     * El cerebro del dashboard. Filtra los datos y llama a todas las funciones 
+     * de renderizado para actualizar la UI según el modo seleccionado.
+     * @param {string} mode - El modo de vista ('general' o el nombre de un área).
+     */
+    function actualizarDashboard(mode) {
+      console.log(`Cambiando dashboard al modo: ${mode}`);
+      currentMode = mode;
+      const isGeneralView = (mode === 'general');
+
+      // 1. FILTRAR DATOS: Creamos un subconjunto de datos basado en el modo.
+      const filteredReviews = isGeneralView ?
+        allAPIData.reviews :
+        (allAPIData.reviews || []).filter(r => r.centro?.nombre === mode);
+
+      // 2. RECALCULAR MÉTRICAS: Usamos los datos filtrados para obtener nuevos KPIs.
+      const stats = calcularStatsPara(filteredReviews);
+      const history = calcularTendenciaPara(filteredReviews);
+      const pareto = calcularParetoPara(filteredReviews);
+
+      // 3. RENDERIZAR COMPONENTES: Llamamos a cada función de renderizado con los nuevos datos.
+      updateAllKPIs(stats, isGeneralView ? (allAPIData.stats?.areas?.length || 0) : 1);
+
+      updateTrendChart(history);
+
+      // Preparamos los datos para la gráfica de áreas.
+      let areasParaGrafica;
+      if (isGeneralView) {
+        areasParaGrafica = allAPIData.stats?.areas;
+      } else {
+        const areaSeleccionada = allAPIData.stats?.areas.find(a => a.centro_nombre === mode);
+        areasParaGrafica = areaSeleccionada ? [areaSeleccionada] : [];
+      }
+      updateDonutAndAreaCharts({ global: stats, areas: areasParaGrafica });
+
+      renderParetoCruzado(pareto);
+      renderRecentReviews(filteredReviews.slice(0, 4));
+
+      // 4. AJUSTAR LA UI: Cambiamos títulos y visibilidad de elementos.
+      const areaName = isGeneralView ? 'Todas las áreas' : mode;
+      const mainTitle = isGeneralView ? 'Dashboard NPS — Vista General' : `Análisis de Área — ${mode}`;
+
+      document.querySelector('.topbar h1').textContent = mainTitle;
+      document.getElementById('selectedAreaText').textContent = areaName;
+      document.querySelectorAll('.dropdown-option').forEach(opt =>
+        opt.classList.toggle('active', opt.dataset.value === mode)
+      );
+      document.getElementById('grid-centros').style.display = isGeneralView ? 'grid' : 'none';
+      document.querySelector('.section-label').style.display = isGeneralView ? 'flex' : 'none';
+    }
+
+
+    // ==========================================
+    // FUNCIONES DE CÁLCULO EN CLIENTE (para filtros)
+    // ==========================================
+
+    /** Calcula KPIs (NPS, %, etc.) para un conjunto dado de reseñas. */
+    function calcularStatsPara(reviews) {
+      if (!reviews || reviews.length === 0) {
+        return { nps: 0, promotores_pct: 0, detractores_pct: 0, resenas_totales: 0, detalles: { p: 0, d: 0, n: 0 } };
+      }
+
+      const total = reviews.length;
+      const promotores = reviews.filter(r => r.nsp_score >= 9).length;
+      const detractores = reviews.filter(r => r.nsp_score <= 6).length;
+      const neutrales = total - promotores - detractores;
+      const nps = total ? Math.round((promotores - detractores) / total * 100) : 0;
+
+      return {
+        nps: nps,
+        promotores_pct: total ? Math.round(promotores / total * 100) : 0,
+        detractores_pct: total ? Math.round(detractores / total * 100) : 0,
+        resenas_totales: total,
+        detalles: { p: promotores, d: detractores, n: neutrales }
+      };
+    }
+
+    async function abrirDetalleFoco(focus, centroId, categoriaId) {
+      const drawer = document.getElementById('detailDrawer');
+      const body = document.getElementById('drawerBody');
+      const subtitle = document.getElementById('drawerSubtitle');
+      if (!drawer || !body || !subtitle) return;
+
+      // Preparamos y mostramos el panel con un mensaje de carga.
+      subtitle.innerHTML = `<span>${focus}</span>`;
+      body.innerHTML = '<div class="loading-text" style="padding: 20px;">Obteniendo análisis de IA...</div>';
+      document.getElementById('detailOverlay').classList.add('show');
+      drawer.classList.add('show');
+
+      // Llamamos a la API para obtener el análisis.
+      const analisis = await fetchPrediccionEstrategica(centroId, categoriaId);
+
+      // Mostramos el resultado (o un error) en el panel.
+      if (analisis && analisis.analisis_predictivo) {
+        // Reemplazamos los saltos de línea y el formato markdown por HTML.
+        const htmlContent = analisis.analisis_predictivo
+          .replace(/\n/g, '<br>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        body.innerHTML = `<div class="ai-box"><div class="v">${htmlContent}</div></div>`;
+      } else {
+        const errorMessage = analisis?.analisis_predictivo || 'No se pudo obtener el análisis de la IA para este foco.';
+        body.innerHTML = `<div class="ai-box alert"><div class="v">${errorMessage}</div></div>`;
+      }
+    }
+
+
+    function cerrarDetalleFoco() {
+      const overlay = document.getElementById('detailOverlay');
+      const drawer = document.getElementById('detailDrawer');
+      const subtitle = document.getElementById('drawerSubtitle');
+      if (overlay) overlay.classList.remove('show');
+      if (drawer) drawer.classList.remove('show');
+      if (subtitle) subtitle.textContent = 'Selecciona un foco para inspección detallada';
+      document.querySelectorAll('.issue-item').forEach((item) => item.classList.remove('active-focus'));
+      document.querySelectorAll('.btn-details').forEach((btn) => btn.classList.remove('active'));
+    }
+
+
+
+    /** Calcula la tendencia histórica para un conjunto dado de reseñas. */
+    function calcularTendenciaPara(reviews) {
+      const porMes = {};
+      (reviews || []).forEach(r => {
+        if (!r.fecha_captura) return;
+        const mes = r.fecha_captura.substring(0, 7); // "YYYY-MM"
+        if (!porMes[mes]) porMes[mes] = [];
+        porMes[mes].push(r);
+      });
+
+      const MESES_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      const labels = [], npsData = [], promoData = [], detData = [];
+
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        const monthKey = d.toISOString().substring(0, 7);
+        const monthLabel = `${MESES_ES[d.getMonth()]} '${d.getFullYear().toString().slice(2)}`;
+
+        labels.push(monthLabel);
+        const statsMes = calcularStatsPara(porMes[monthKey] || []);
+        npsData.push(statsMes.nps);
+        promoData.push(statsMes.promotores_pct);
+        detData.push(statsMes.detractores_pct);
+      }
+      return { labels, npsData, promoData, detData };
+    }
+
+    /** Calcula el análisis de Pareto para un conjunto dado de reseñas. */
+    function calcularParetoPara(reviews) {
+      const detractores = (reviews || []).filter(r => r.nsp_score <= 6);
+      if (detractores.length === 0) return [];
+
+      const frecuencias = {};
+      detractores.forEach(r => {
+        const cat = r.nivel_1?.categoria?.nombre;
+        const subcat = r.nivel_1?.sub_categoria?.nombre;
+        if (!cat || !subcat) return;
+        const key = `${cat}#|#${subcat}`; // Separador robusto
+        if (!frecuencias[key]) {
+          frecuencias[key] = { frecuencia: 0, areas: new Set() };
+        }
+        frecuencias[key].frecuencia++;
+        if (r.centro?.nombre) {
+          frecuencias[key].areas.add(r.centro.nombre);
+        }
+      });
+
+      const lista = Object.keys(frecuencias).map(key => {
+        const [cat, subcat] = key.split('#|#');
+        return {
+          categoria: cat, subcategoria: subcat,
+          frecuencia: frecuencias[key].frecuencia,
+          areas_afectadas: Array.from(frecuencias[key].areas)
+        };
+      }).sort((a, b) => b.frecuencia - a.frecuencia);
+
+      let acumulado = 0;
+      return lista.map(item => {
+        const porcentaje = (item.frecuencia / detractores.length) * 100;
+        acumulado += porcentaje;
+        return { ...item, porcentaje, porcentaje_acumulado: acumulado };
+      });
+    }
+
+    // ==========================================
+    // MANEJO DE EVENTOS Y RENDERIZADO DE UI
+    // ==========================================
+
+    /** Rellena el menú desplegable con las áreas obtenidas de la API. */
+    function poblarDropdownAreas(areas) {
+      const menu = document.querySelector('.dropdown-menu');
+      if (!menu || !areas) return;
+      menu.querySelectorAll('.dropdown-option:not([data-value="general"])').forEach(opt => opt.remove());
+
+      areas.forEach(area => {
+        const option = document.createElement('div');
+        option.className = 'dropdown-option';
+        option.dataset.value = area.centro_nombre;
+        option.innerHTML = `${area.centro_nombre} <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        menu.appendChild(option);
+      });
+    }
+
+    /** Asigna los listeners de click al dropdown. */
+    function setupEventListeners() {
+      const dropdown = document.getElementById('areaDropdown');
+      const trigger = document.getElementById('dropdownTrigger');
+
+      if (trigger) {
+        trigger.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+      }
+
+      if (dropdown) {
+        dropdown.addEventListener('click', (e) => {
+          const option = e.target.closest('.dropdown-option');
+          if (option) {
+            e.stopPropagation();
+            actualizarDashboard(option.dataset.value);
+            dropdown.classList.remove('open');
+          }
+        });
+      }
+
+      document.addEventListener('click', () => dropdown && dropdown.classList.remove('open'));
+    }
+
+    /** Actualiza los 5 KPIs principales. */
+    function updateAllKPIs(stats, areaCount) {
+      document.querySelector('.kpi-card.nps .kpi-value').innerText = `${stats.nps > 0 ? '+' : ''}${stats.nps}`;
+      document.querySelector('.kpi-card.promo .kpi-value').innerText = `${stats.promotores_pct}%`;
+      document.querySelector('.kpi-card.detract .kpi-value').innerText = `${stats.detractores_pct}%`;
+      document.querySelector('.kpi-card.resenas .kpi-value').innerText = stats.resenas_totales.toLocaleString('es-MX');
+      document.querySelector('.kpi-card.areas .kpi-value').innerText = areaCount;
+      // La lógica de los deltas se podría mejorar para funcionar con datos filtrados
+      document.querySelector('.kpi-card.nps .kpi-delta').innerText = '...';
+      document.querySelector('.kpi-card.promo .kpi-delta').innerText = '...';
+      document.querySelector('.kpi-card.detract .kpi-delta').innerText = '...';
+    }
+
+    /** Actualiza la gráfica de línea de tendencia. */
+    function updateTrendChart(historyData) {
+      if (!charts.npsChart || !historyData) return;
+      charts.npsChart.data.labels = historyData.labels;
+      charts.npsChart.data.datasets[0].data = historyData.npsData;
+      charts.npsChart.data.datasets[1].data = historyData.promoData;
+      charts.npsChart.data.datasets[2].data = historyData.detData;
+      charts.npsChart.update();
+    }
+
+    /** Actualiza la gráfica de dona y la de barras. */
+    function updateDonutAndAreaCharts({ global, areas }) {
+      if (charts.donutChart && global?.detalles) {
+        charts.donutChart.data.datasets[0].data = [global.detalles.p, global.detalles.n, global.detalles.d];
+        charts.donutChart.update();
+      }
+
+      if (charts.areaBarChart && areas) {
+        const sortedAreas = [...areas].sort((a, b) => b.nps - a.nps);
+        charts.areaBarChart.data.labels = sortedAreas.map(area => area.centro_nombre);
+        charts.areaBarChart.data.datasets[0].data = sortedAreas.map(area => area.nps);
+        charts.areaBarChart.data.datasets[0].backgroundColor = sortedAreas.map(area => {
+          if (area.nps > 40) return '#1B8A5A';
+          if (area.nps > 10) return '#0047BA';
+          if (area.nps > -10) return '#F9A825';
+          return '#D32F2F';
+        });
+        charts.areaBarChart.update();
+      }
+    }
+
+    /** Renderiza la lista de Pareto. */
+    function renderParetoCruzado(paretoData) {
+      const container = document.getElementById('pareto-cruzado-container');
+      if (!container) return;
+      if (!paretoData || paretoData.length === 0) {
+        container.innerHTML = '<div class="loading-text" style="padding: 20px;">No hay detractores para analizar.</div>';
+        return;
+      }
+      container.innerHTML = '';
+      const top5Problemas = paretoData.slice(0, 5);
+      const maxFrecuencia = top5Problemas.length > 0 ? top5Problemas[0].frecuencia : 1;
+
+      top5Problemas.forEach((item, index) => {
+        const rank = index + 1;
+        const rankClass = (rank <= 2) ? 'top' : '';
+        const barWidth = (item.frecuencia / maxFrecuencia) * 100;
+        const barClass = (item.porcentaje_acumulado <= 80.5) ? 'red' : '';
+        const areaTagsHtml = (item.areas_afectadas || []).map(area => `<span class="atag">${area}</span>`).join('');
+
+        const itemHtml = `
+            <div class="issue-item">
+                <div class="issue-rank ${rankClass}">${rank}</div>
+                <div class="issue-info">
+                    <div class="issue-name">${item.categoria}</div>
+                    <div class="issue-subname">${item.subcategoria}</div>
+                    <div class="issue-area-tags">${areaTagsHtml}</div>
+                </div>
+                <div class="issue-bar-wrap">
+                    <div class="issue-bar-bg">
+                        <div class="issue-bar ${barClass}" style="width:${barWidth}%"></div>
+                    </div>
+                    <div class="issue-pct">${Math.round(barWidth)}%</div>
+                </div>
+                <div class="issue-count">${item.frecuencia}</div>
+                <div class="issue-actions">
+                    <button class="btn-details" 
+                        data-focus="${item.subcategoria}" 
+                        data-categoria="${item.categoria}" 
+                        data-centro="${(item.areas_afectadas || [])[0] || ''}">
+                        Detalles
+                    </button>
+
+                </div>
+            </div>`;
+        container.insertAdjacentHTML('beforeend', itemHtml);
+      });
+    }
+
+    /** Renderiza la lista de reseñas recientes. */
+    function renderRecentReviews(reviewsData) {
+      const container = document.getElementById('recent-reviews-container');
+      if (!container) return;
+      if (!reviewsData || reviewsData.length === 0) {
+        container.innerHTML = '<div class="loading-text" style="padding: 20px;">No hay reseñas en esta vista.</div>';
+        return;
+      }
+      container.innerHTML = '';
+
+      reviewsData.forEach(review => {
+        let scoreClass = 'n'; let tagClass = 'neutral';
+        if (review.nsp_score >= 9) { scoreClass = 'p'; tagClass = 'promo'; }
+        else if (review.nsp_score <= 6) { scoreClass = 'd'; tagClass = 'detract'; }
+
+        const itemHtml = `
+                <div class="review-item">
+                    <div class="review-top">
+                        <span class="review-area">${review.centro?.nombre || 'N/A'} · ${review.nivel_1?.sub_categoria?.nombre || 'N/A'}</span>
+                        <div style="display:flex;align-items:center;gap:7px;">
+                            <span class="review-time">${timeAgo(review.fecha_captura)}</span>
+                            <div class="score-pill ${scoreClass}">${review.nsp_score}</div>
+                        </div>
+                    </div>
+                    <div class="review-text">"${review.historia}"</div>
+                    <div class="review-tags">
+                        <span class="tag ${tagClass}">${review.clasificacionNPS?.nombre || 'N/A'}</span>
+                        <span class="tag domain">${review.nivel_1?.categoria?.nombre || 'N/A'}</span>
+                    </div>
+                </div>`;
+        container.insertAdjacentHTML('beforeend', itemHtml);
+      });
+    }
+
+    /** Función auxiliar para calcular el tiempo relativo. */
+    function timeAgo(dateString) {
+      if (!dateString) return '';
+      const now = new Date();
+      const past = new Date(dateString.replace(' ', 'T'));
+      const seconds = Math.floor((now - past) / 1000);
+      if (isNaN(seconds)) return '';
+      let interval = seconds / 31536000;
+      if (interval > 1) return `hace ${Math.floor(interval)} años`;
+      interval = seconds / 2592000;
+      if (interval > 1) return `hace ${Math.floor(interval)} meses`;
+      interval = seconds / 86400;
+      if (interval > 1) return `hace ${Math.floor(interval)} días`;
+      interval = seconds / 3600;
+      if (interval > 1) return `hace ${Math.floor(interval)} h`;
+      interval = seconds / 60;
+      if (interval > 1) return `hace ${Math.floor(interval)} min`;
+      return `hace unos seg`;
+    }
+
+    function renderCentrosCards(areasData) {
+      const grid = document.getElementById('grid-centros');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const themeColors = [
+        { bg: '#E8F0FD', color: '#0047BA' }, { bg: '#E8F5EF', color: '#1B8A5A' },
+        { bg: '#FFF8E1', color: '#F9A825' }, { bg: '#F3E5F5', color: '#6A1B9A' },
+        { bg: '#FFF3E0', color: '#E65100' }, { bg: '#FDECEA', color: '#D32F2F' }
+      ];
+
+      areasData.forEach((area, index) => {
+        const { nps, promotores_pct, detractores_pct, resenas_totales, centro_nombre } = area;
+        let npsClass = 'good', cardClass = 'area-card', alertHtml = '';
+
+        if (nps > 40) npsClass = 'good';
+        else if (nps > 10) npsClass = 'mid';
+        else if (nps >= 0) npsClass = 'warn';
+        else {
+          npsClass = 'bad';
+          cardClass = 'area-card alert';
+          alertHtml = '<div class="area-alert-dot"></div>';
+        }
+
+        const iconText = centro_nombre.substring(0, 2).toUpperCase();
+        const theme = themeColors[index % themeColors.length];
+        const cardHtml = `
+                <div class="${cardClass}" style="animation-delay:${0.1 + (index * 0.05)}s">
+                  <div class="area-header">
+                    <div class="area-icon" style="background:${theme.bg};color:${theme.color};">${iconText}</div>
+                    ${alertHtml}
+                  </div>
+                  <div class="area-name" title="${centro_nombre}">${centro_nombre}</div>
+                  <div class="area-nps ${npsClass}">${nps > 0 ? '+' : ''}${nps}</div>
+                  <div class="area-stats">
+                    <div class="area-stat"><div class="stat-val" style="color:#1B8A5A;">${Math.round(promotores_pct)}%</div><div class="stat-lbl">Promo</div></div>
+                    <div class="area-stat"><div class="stat-val" style="color:#D32F2F;">${Math.round(detractores_pct)}%</div><div class="stat-lbl">Detrac</div></div>
+                    <div class="area-stat"><div class="stat-val">${resenas_totales}</div><div class="stat-lbl">Reseñas</div></div>
+                  </div>
+                </div>`;
+        grid.insertAdjacentHTML('beforeend', cardHtml);
+      });
+    }
+
+    /** Inicializa las instancias de Chart.js con datos de ejemplo. */
+    function initCharts() {
+      const ctx1 = document.getElementById('npsChart').getContext('2d');
+      charts.npsChart = new Chart(ctx1, {
+        type: 'line', data: { labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'], datasets: [{ label: 'NPS Global', data: [0, 0, 0, 0, 0, 0], borderColor: '#003087', backgroundColor: 'rgba(0,48,135,0.07)', borderWidth: 2.5, tension: 0.4, fill: true }, { label: 'Promotores %', data: [0, 0, 0, 0, 0, 0], borderColor: '#1B8A5A', borderWidth: 2, borderDash: [5, 4] }, { label: 'Detractores %', data: [0, 0, 0, 0, 0, 0], borderColor: '#D32F2F', borderWidth: 2, borderDash: [5, 4] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: '#EEF1F8' } } } }
+      });
+
+      const ctx2 = document.getElementById('areaBarChart').getContext('2d');
+      charts.areaBarChart = new Chart(ctx2, {
+        type: 'bar', data: { labels: [], datasets: [{ label: 'NPS', data: [], backgroundColor: [], borderRadius: 6 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { min: -100, max: 100 }, y: { grid: { display: false } } } }
+      });
+
+      const ctx3 = document.getElementById('donutChart').getContext('2d');
+      charts.donutChart = new Chart(ctx3, {
+        type: 'doughnut', data: { labels: ['Promotores', 'Neutrales', 'Detractores'], datasets: [{ data: [1, 1, 1], backgroundColor: ['#1B8A5A', '#F9A825', '#D32F2F'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '66%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } } } }
+      });
+    }
+
+
+    document.addEventListener('click', async (e) => {
+      // Usamos .closest() que es más robusto. Funciona incluso si haces clic en un icono dentro del botón.
+      const button = e.target.closest('.btn-details');
+
+      if (button) {
+        // 1. Leemos los NOMBRES desde los data-attributes del botón
+        const { focus, categoria: categoriaNombre, centro: centroNombre } = button.dataset;
+
+        console.log("Datos del botón:", { focus, categoriaNombre, centroNombre });
+        console.log("Buscar eb ");
+        let categoriaId = null;
+        let centroId = null;
+
+        // 2. Buscamos el ID de la Categoría
+
+        const categoriaEncontrada = allAPIData.categorias.find(cat => cat.nombre === categoriaNombre);
+        if (categoriaEncontrada) {
+          categoriaId = categoriaEncontrada._id;
+        }
+
+
+        // 3. Buscamos el ID del Centro
+
+        const centroEncontrado = allAPIData.centros.find(cen => cen.nombre === centroNombre);
+        if (centroEncontrado) {
+          centroId = centroEncontrado._id;
+        }
+
+
+        console.log("IDs encontrados:", { categoriaId, centroId });
+
+        // 4. Llamamos a la función que abre el panel con los IDs encontrados
+        await abrirDetalleFoco(focus, centroId, categoriaId);
+      }
+    });
+
+
+    document.getElementById('drawerClose').addEventListener('click', cerrarDetalleFoco);
+    document.getElementById('detailOverlay').addEventListener('click', cerrarDetalleFoco);
+
+
+  </script>
+
+
+
+
+
+
+</body>
+
+</html>
